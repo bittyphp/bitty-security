@@ -21,7 +21,7 @@ $ composer require bittyphp/bitty-security
 
 ## Setup
 
-Security is added as a middleware component. This middleware is designed to be applied **before** all other middleware. Security should always be the first priority. However, it's up to you to ensure it's set up that way.
+Security is added as a middleware component. This middleware is recommended to be applied **before** other middleware. The only other middleware that might come before security is an exception handler. Security should always be a top priority. However, it's up to you to ensure it's set up that way.
 
 ### Basic Usage
 
@@ -36,15 +36,11 @@ use Bitty\Security\Shield\FormShield;
 
 $app = new Application();
 
-// Add security first!
 $app->add(
     new SecurityMiddleware(
         new FormShield(...)
     )
 );
-
-// Then add any other middleware components.
-$app->add(...);
 ```
 
 ### Accessing the Security Context
