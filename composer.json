@@ -12,6 +12,7 @@
     "require": {
         "php": ">=7.1.0",
         "bittyphp/bitty-container": "^2.0",
+        "bittyphp/bitty-event-manager": "^2.0",
         "bittyphp/bitty-http": "^2.0",
         "bittyphp/bitty-middleware": "^2.0",
         "container-interop/service-provider": "^0.4",
