@@ -13,7 +13,7 @@ class ContextCollection implements ContextInterface
     protected $contexts = null;
 
     /**
-     * @var ContextInterface
+     * @var ContextInterface|null
      */
     protected $activeContext = null;
 
@@ -22,7 +22,7 @@ class ContextCollection implements ContextInterface
      *
      * @param ContextInterface $context
      */
-    public function add(ContextInterface $context)
+    public function add(ContextInterface $context): void
     {
         $this->contexts[] = $context;
     }
@@ -30,7 +30,7 @@ class ContextCollection implements ContextInterface
     /**
      * Clears the active context, if one is set.
      */
-    public function clearActiveContext()
+    public function clearActiveContext(): void
     {
         $this->activeContext = null;
     }
@@ -38,7 +38,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         $this->activeContext = null;
 
@@ -56,7 +56,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function set($name, $value)
+    public function set(string $name, $value): void
     {
         $this->activeContext = null;
 
@@ -68,7 +68,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function get($name, $default = null)
+    public function get(string $name, $default = null)
     {
         if ($this->activeContext) {
             return $this->activeContext->get($name, $default);
@@ -87,7 +87,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function remove($name)
+    public function remove(string $name): void
     {
         $this->activeContext = null;
 
@@ -99,7 +99,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->activeContext = null;
 
@@ -111,7 +111,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function isShielded(ServerRequestInterface $request)
+    public function isShielded(ServerRequestInterface $request): bool
     {
         $this->activeContext = null;
 
@@ -129,7 +129,7 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function getPatternMatch(ServerRequestInterface $request)
+    public function getPatternMatch(ServerRequestInterface $request): array
     {
         $this->activeContext = null;
 

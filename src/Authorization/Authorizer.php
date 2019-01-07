@@ -11,7 +11,7 @@ class Authorizer implements AuthorizerInterface
     /**
      * {@inheritDoc}
      */
-    public function authorize(UserInterface $user, array $roles)
+    public function authorize(UserInterface $user, array $roles): bool
     {
         // throw new AuthorizationException('not done');
         return true;

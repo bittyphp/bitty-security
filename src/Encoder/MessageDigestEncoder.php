@@ -14,9 +14,9 @@ class MessageDigestEncoder extends AbstractEncoder
     /**
      * @param string $algorithm
      */
-    public function __construct($algorithm)
+    public function __construct(string $algorithm)
     {
-        if (!in_array($algorithm, hash_algos())) {
+        if (!in_array($algorithm, hash_algos(), true)) {
             throw new \InvalidArgumentException(
                 sprintf('"%s" is not a valid hash algorithm.', $algorithm)
             );
@@ -28,7 +28,7 @@ class MessageDigestEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function encode($password, $salt = null)
+    public function encode(string $password, string $salt = null): string
     {
         $this->checkPassword($password);
 

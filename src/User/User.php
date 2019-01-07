@@ -17,7 +17,7 @@ class User implements UserInterface
     protected $password = null;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $salt = null;
 
@@ -32,8 +32,12 @@ class User implements UserInterface
      * @param string|null $salt
      * @param string[] $roles
      */
-    public function __construct($username, $password, $salt = null, array $roles = [])
-    {
+    public function __construct(
+        string $username,
+        string $password,
+        string $salt = null,
+        array $roles = []
+    ) {
         $this->username = $username;
         $this->password = $password;
         $this->salt     = $salt;
@@ -45,7 +49,7 @@ class User implements UserInterface
      *
      * @return string[]
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['username', 'roles'];
     }
@@ -53,7 +57,7 @@ class User implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -61,7 +65,7 @@ class User implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -69,7 +73,7 @@ class User implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
@@ -77,7 +81,7 @@ class User implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }

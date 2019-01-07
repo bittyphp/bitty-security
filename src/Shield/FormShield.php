@@ -13,7 +13,7 @@ class FormShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
         $path = $request->getUri()->getPath();
 
@@ -32,7 +32,7 @@ class FormShield extends AbstractShield
 
         $match = $this->context->getPatternMatch($request);
         if (empty($match) || empty($match['roles'])) {
-            return;
+            return null;
         }
 
         $user = $this->context->get('user');
@@ -47,6 +47,8 @@ class FormShield extends AbstractShield
         }
 
         $this->authorize($user, $match['roles']);
+
+        return null;
     }
 
     /**
@@ -56,15 +58,15 @@ class FormShield extends AbstractShield
      *
      * @return ResponseInterface|null
      */
-    protected function handleFormLogin(ServerRequestInterface $request)
+    protected function handleFormLogin(ServerRequestInterface $request): ?ResponseInterface
     {
         if ('POST' !== $request->getMethod()) {
-            return;
+            return null;
         }
 
         $params = $request->getParsedBody();
         if (!is_array($params)) {
-            return;
+            return null;
         }
 
         $usernameField = $this->config['login.username'];
@@ -74,7 +76,7 @@ class FormShield extends AbstractShield
         $password = empty($params[$passwordField]) ? '' : $params[$passwordField];
 
         if (empty($username) || empty($password)) {
-            return;
+            return null;
         }
 
         $user = $this->authenticate($username, $password);
@@ -91,7 +93,7 @@ class FormShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultConfig()
+    protected function getDefaultConfig(): array
     {
         return [
             'login.path' => '/login',

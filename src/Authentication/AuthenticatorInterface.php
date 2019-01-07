@@ -17,7 +17,7 @@ interface AuthenticatorInterface
      *
      * @throws AuthenticationException
      */
-    public function authenticate($username, $password);
+    public function authenticate(string $username, string $password): UserInterface;
 
     /**
      * Reloads a user.
@@ -27,7 +27,7 @@ interface AuthenticatorInterface
      *
      * @param UserInterface $user
      *
-     * @return UserInterface
+     * @return UserInterface|null
      */
-    public function reloadUser(UserInterface $user);
+    public function reloadUser(UserInterface $user): ?UserInterface;
 }

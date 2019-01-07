@@ -11,7 +11,7 @@ interface ContextInterface
      *
      * @return bool
      */
-    public function isDefault();
+    public function isDefault(): bool;
 
     /**
      * Sets context data.
@@ -19,7 +19,7 @@ interface ContextInterface
      * @param string $name
      * @param mixed $value
      */
-    public function set($name, $value);
+    public function set(string $name, $value): void;
 
     /**
      * Gets context data.
@@ -29,19 +29,19 @@ interface ContextInterface
      *
      * @return mixed
      */
-    public function get($name, $default = null);
+    public function get(string $name, $default = null);
 
     /**
      * Removes context data.
      *
      * @param string $name
      */
-    public function remove($name);
+    public function remove(string $name): void;
 
     /**
      * Clears all context data.
      */
-    public function clear();
+    public function clear(): void;
 
     /**
      * Checks if a request is shielded.
@@ -50,7 +50,7 @@ interface ContextInterface
      *
      * @return bool
      */
-    public function isShielded(ServerRequestInterface $request);
+    public function isShielded(ServerRequestInterface $request): bool;
 
     /**
      * Gets the first pattern and roles that match the request.
@@ -61,5 +61,5 @@ interface ContextInterface
      *
      * @return mixed[]
      */
-    public function getPatternMatch(ServerRequestInterface $request);
+    public function getPatternMatch(ServerRequestInterface $request): array;
 }

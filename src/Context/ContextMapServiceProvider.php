@@ -12,7 +12,7 @@ class ContextMapServiceProvider implements ServiceProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getFactories()
+    public function getFactories(): array
     {
         return [];
     }
@@ -20,7 +20,7 @@ class ContextMapServiceProvider implements ServiceProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return [
             'security.context' => function (ContainerInterface $container, ContextMapInterface $previous = null) {

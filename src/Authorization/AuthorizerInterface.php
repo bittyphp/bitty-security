@@ -17,5 +17,5 @@ interface AuthorizerInterface
      *
      * @throws AuthorizationException
      */
-    public function authorize(UserInterface $user, array $roles);
+    public function authorize(UserInterface $user, array $roles): bool;
 }

@@ -9,7 +9,7 @@ class PlainTextEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function encode($password, $salt = null)
+    public function encode(string $password, string $salt = null): string
     {
         $this->checkPassword($password);
 
