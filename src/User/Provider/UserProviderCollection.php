@@ -3,6 +3,7 @@
 namespace Bitty\Security\User\Provider;
 
 use Bitty\Security\User\Provider\UserProviderInterface;
+use Bitty\Security\User\UserInterface;
 
 class UserProviderCollection implements UserProviderInterface
 {
@@ -26,7 +27,7 @@ class UserProviderCollection implements UserProviderInterface
      *
      * @param UserProviderInterface $userProvider
      */
-    public function add(UserProviderInterface $userProvider)
+    public function add(UserProviderInterface $userProvider): void
     {
         $this->providers[] = $userProvider;
     }
@@ -34,7 +35,7 @@ class UserProviderCollection implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getUser($username)
+    public function getUser(string $username): ?UserInterface
     {
         foreach ($this->providers as $provider) {
             $user = $provider->getUser($username);
@@ -42,5 +43,7 @@ class UserProviderCollection implements UserProviderInterface
                 return $user;
             }
         }
+
+        return null;
     }
 }

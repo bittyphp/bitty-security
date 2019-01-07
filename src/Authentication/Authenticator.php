@@ -34,7 +34,7 @@ class Authenticator implements AuthenticatorInterface
     /**
      * {@inheritDoc}
      */
-    public function authenticate($username, $password)
+    public function authenticate(string $username, string $password): UserInterface
     {
         $user = $this->userProvider->getUser($username);
         if (!$user) {
@@ -55,7 +55,7 @@ class Authenticator implements AuthenticatorInterface
     /**
      * {@inheritDoc}
      */
-    public function reloadUser(UserInterface $user)
+    public function reloadUser(UserInterface $user): ?UserInterface
     {
         return $this->userProvider->getUser($user->getUsername());
     }

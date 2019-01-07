@@ -10,12 +10,12 @@ abstract class AbstractEncoder implements EncoderInterface
     /**
      * {@inheritDoc}
      */
-    abstract public function encode($password, $salt = null);
+    abstract public function encode(string $password, string $salt = null): string;
 
     /**
      * {@inheritDoc}
      */
-    public function verify($encoded, $password, $salt = null)
+    public function verify(string $encoded, string $password, string $salt = null): bool
     {
         $this->checkPassword($password);
 
@@ -31,7 +31,7 @@ abstract class AbstractEncoder implements EncoderInterface
      *
      * @throws AuthenticationException
      */
-    protected function checkPassword($password)
+    protected function checkPassword(string $password): void
     {
         if (strlen($password) > EncoderInterface::MAX_PASSWORD_LEN) {
             throw new AuthenticationException('Invalid password.');

@@ -21,12 +21,12 @@ interface ShieldInterface
      *
      * @throws SecurityException
      */
-    public function handle(ServerRequestInterface $request);
+    public function handle(ServerRequestInterface $request): ?ResponseInterface;
 
     /**
      * Gets the shield context.
      *
      * @return ContextInterface
      */
-    public function getContext();
+    public function getContext(): ContextInterface;
 }

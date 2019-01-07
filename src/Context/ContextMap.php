@@ -4,6 +4,7 @@ namespace Bitty\Security\Context;
 
 use Bitty\Security\Context\ContextInterface;
 use Bitty\Security\Context\ContextMapInterface;
+use Bitty\Security\User\UserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ContextMap implements ContextMapInterface
@@ -16,7 +17,7 @@ class ContextMap implements ContextMapInterface
     /**
      * {@inheritDoc}
      */
-    public function add(ContextInterface $context)
+    public function add(ContextInterface $context): void
     {
         $this->contexts[] = $context;
     }
@@ -24,7 +25,7 @@ class ContextMap implements ContextMapInterface
     /**
      * {@inheritDoc}
      */
-    public function getUser(ServerRequestInterface $request)
+    public function getUser(ServerRequestInterface $request): ?UserInterface
     {
         // Find user based on request.
         foreach ($this->contexts as $context) {
@@ -47,5 +48,7 @@ class ContextMap implements ContextMapInterface
         if ($default) {
             return $default->get('user');
         }
+
+        return null;
     }
 }

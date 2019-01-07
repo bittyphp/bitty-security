@@ -9,26 +9,26 @@ interface UserInterface
      *
      * @return string
      */
-    public function getUsername();
+    public function getUsername(): string;
 
     /**
      * Gets the encoded password.
      *
      * @return string
      */
-    public function getPassword();
+    public function getPassword(): string;
 
     /**
      * Gets the password salt.
      *
      * @return string|null
      */
-    public function getSalt();
+    public function getSalt(): ?string;
 
     /**
      * Gets the roles the user has.
      *
      * @return string[]
      */
-    public function getRoles();
+    public function getRoles(): array;
 }

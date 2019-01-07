@@ -3,6 +3,7 @@
 namespace Bitty\Security\Encoder;
 
 use Bitty\Security\Encoder\AbstractEncoder;
+use Bitty\Security\Exception\AuthenticationException;
 
 class BcryptEncoder extends AbstractEncoder
 {
@@ -14,7 +15,7 @@ class BcryptEncoder extends AbstractEncoder
     /**
      * @param int $cost
      */
-    public function __construct($cost = 10)
+    public function __construct(int $cost = 10)
     {
         $this->cost = $cost;
     }
@@ -22,17 +23,22 @@ class BcryptEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function encode($password, $salt = null)
+    public function encode(string $password, string $salt = null): string
     {
         $this->checkPassword($password);
 
-        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->cost]);
+        $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->cost]);
+        if (false === $hash) {
+            throw new AuthenticationException('Failed to encode password.');
+        }
+
+        return $hash;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function verify($encoded, $password, $salt = null)
+    public function verify(string $encoded, string $password, string $salt = null): bool
     {
         $this->checkPassword($password);
 

@@ -4,16 +4,17 @@ namespace Bitty\Security\User\Provider;
 
 use Bitty\Security\User\Provider\AbstractUserProvider;
 use Bitty\Security\User\User;
+use Bitty\Security\User\UserInterface;
 
 class InMemoryUserProvider extends AbstractUserProvider
 {
     /**
-     * @var string[]
+     * @var array Array of string[]
      */
     protected $users = [];
 
     /**
-     * @param string[] $users
+     * @param array $users Array of string[]
      */
     public function __construct(array $users)
     {
@@ -23,17 +24,17 @@ class InMemoryUserProvider extends AbstractUserProvider
     /**
      * {@inheritDoc}
      */
-    public function getUser($username)
+    public function getUser(string $username): ?UserInterface
     {
         $this->checkUsername($username);
 
         if (!isset($this->users[$username])) {
-            return;
+            return null;
         }
 
         $user = $this->users[$username];
         if (empty($user['password'])) {
-            return;
+            return null;
         }
 
         $password = $user['password'];

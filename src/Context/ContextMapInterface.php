@@ -13,7 +13,7 @@ interface ContextMapInterface
      *
      * @param ContextInterface $context
      */
-    public function add(ContextInterface $context);
+    public function add(ContextInterface $context): void;
 
     /**
      * Gets the authenticated user for the request, if any.
@@ -25,5 +25,5 @@ interface ContextMapInterface
      *
      * @return UserInterface|null
      */
-    public function getUser(ServerRequestInterface $request);
+    public function getUser(ServerRequestInterface $request): ?UserInterface;
 }

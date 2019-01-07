@@ -5,6 +5,7 @@ namespace Bitty\Security\Shield;
 use Bitty\Http\Response;
 use Bitty\Security\Shield\AbstractShield;
 use Bitty\Security\User\UserInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class HttpBasicShield extends AbstractShield
@@ -12,18 +13,18 @@ class HttpBasicShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
         $match = $this->context->getPatternMatch($request);
         if (empty($match) || empty($match['roles'])) {
-            return;
+            return null;
         }
 
         $user = $this->getUser($request);
         if ($user) {
             $this->authorize($user, $match['roles']);
 
-            return;
+            return null;
         }
 
         $headers = [
@@ -43,7 +44,7 @@ class HttpBasicShield extends AbstractShield
      *
      * @return UserInterface|null
      */
-    protected function getUser(ServerRequestInterface $request)
+    protected function getUser(ServerRequestInterface $request): ?UserInterface
     {
         $user = $this->context->get('user');
         if ($user) {
@@ -58,7 +59,7 @@ class HttpBasicShield extends AbstractShield
         $password = empty($params['PHP_AUTH_PW']) ? null : $params['PHP_AUTH_PW'];
 
         if (empty($username) || empty($password)) {
-            return;
+            return null;
         }
 
         $user = $this->authenticate($username, $password);
@@ -69,7 +70,7 @@ class HttpBasicShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultConfig()
+    protected function getDefaultConfig(): array
     {
         return [
             'realm' => 'Secured Area',

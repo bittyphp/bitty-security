@@ -4,18 +4,19 @@ namespace Bitty\Security;
 
 use Bitty\Container\ContainerAwareInterface;
 use Bitty\Container\ContainerInterface;
-use Bitty\Middleware\MiddlewareInterface;
-use Bitty\Middleware\RequestHandlerInterface;
 use Bitty\Security\Context\ContextMapInterface;
 use Bitty\Security\Context\ContextMapServiceProvider;
 use Bitty\Security\Shield\ShieldInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
 {
     /**
-     * @var PsrContainerInterface
+     * @var PsrContainerInterface|null
      */
     protected $container = null;
 
@@ -40,7 +41,7 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function setContainer(PsrContainerInterface $container = null)
+    public function setContainer(PsrContainerInterface $container = null): void
     {
         if ($container instanceof ContainerInterface) {
             $container->register([new ContextMapServiceProvider()]);
@@ -59,7 +60,7 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function getContainer()
+    public function getContainer(): ?PsrContainerInterface
     {
         return $this->container;
     }
@@ -67,8 +68,10 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
-    {
+    public function process(
+        ServerRequestInterface $request,
+        RequestHandlerInterface $handler
+    ): ResponseInterface {
         $response = $this->shield->handle($request);
         if ($response) {
             return $response;

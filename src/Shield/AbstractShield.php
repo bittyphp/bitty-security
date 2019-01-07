@@ -12,6 +12,7 @@ use Bitty\Security\Exception\AuthenticationException;
 use Bitty\Security\Exception\AuthorizationException;
 use Bitty\Security\Shield\ShieldInterface;
 use Bitty\Security\User\UserInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractShield implements ShieldInterface, ContainerAwareInterface
@@ -59,12 +60,12 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
     /**
      * {@inheritDoc}
      */
-    abstract public function handle(ServerRequestInterface $request);
+    abstract public function handle(ServerRequestInterface $request): ?ResponseInterface;
 
     /**
      * {@inheritDoc}
      */
-    public function getContext()
+    public function getContext(): ContextInterface
     {
         return $this->context;
     }
@@ -74,7 +75,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @return mixed[]
      */
-    protected function getDefaultConfig()
+    protected function getDefaultConfig(): array
     {
         return [];
     }
@@ -88,7 +89,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @return mixed
      */
-    protected function triggerEvent($event, $target = null, $params = [])
+    protected function triggerEvent($event, $target = null, array $params = [])
     {
         if (!$this->container || !$this->container->has('event.manager')) {
             return;
@@ -109,9 +110,10 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @throws AuthenticationException
      */
-    protected function authenticate($username, $password)
+    protected function authenticate(string $username, string $password): UserInterface
     {
         $this->triggerEvent('security.authentication.start', null, ['username' => $username]);
+
         try {
             $user = $this->authenticator->authenticate($username, $password);
         } catch (AuthenticationException $exception) {
@@ -126,6 +128,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
 
             throw $exception;
         }
+
         $this->context->set('user', $user);
         $this->triggerEvent('security.authentication.success', $user);
 
@@ -140,9 +143,10 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @throws AuthorizationException
      */
-    protected function authorize(UserInterface $user, array $roles)
+    protected function authorize(UserInterface $user, array $roles): void
     {
         $this->triggerEvent('security.authorization.start', $user);
+
         try {
             $this->authorizer->authorize($user, $roles);
         } catch (AuthorizationException $exception) {
@@ -154,6 +158,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
 
             throw $exception;
         }
+
         $this->triggerEvent('security.authorization.success', $user);
     }
 }

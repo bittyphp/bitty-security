@@ -4,14 +4,16 @@ namespace Bitty\Security\Shield;
 
 use Bitty\Container\ContainerAwareInterface;
 use Bitty\Security\Context\ContextCollection;
+use Bitty\Security\Context\ContextInterface;
 use Bitty\Security\Shield\ShieldInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ShieldCollection implements ShieldInterface, ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     protected $container = null;
 
@@ -40,7 +42,7 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         foreach ($this->shields as $shield) {
             if ($shield instanceof ContainerAwareInterface) {
@@ -54,7 +56,7 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function getContainer()
+    public function getContainer(): ?ContainerInterface
     {
         return $this->container;
     }
@@ -64,7 +66,7 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
      *
      * @param ShieldInterface $shield
      */
-    public function add(ShieldInterface $shield)
+    public function add(ShieldInterface $shield): void
     {
         if ($shield instanceof ContainerAwareInterface) {
             $shield->setContainer($this->container);
@@ -77,7 +79,7 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
         foreach ($this->shields as $shield) {
             $response = $shield->handle($request);
@@ -85,12 +87,14 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
                 return $response;
             }
         }
+
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getContext()
+    public function getContext(): ContextInterface
     {
         return $this->context;
     }

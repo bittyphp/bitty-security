@@ -27,7 +27,7 @@ class Context implements ContextInterface
      * @param string[] $paths
      * @param mixed[] $config
      */
-    public function __construct($name, array $paths, array $config = [])
+    public function __construct(string $name, array $paths, array $config = [])
     {
         $this->name   = $name;
         $this->paths  = $paths;
@@ -37,7 +37,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return (bool) $this->config['default'];
     }
@@ -45,7 +45,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function set($name, $value)
+    public function set(string $name, $value): void
     {
         if ('user' === $name) {
             $now = time();
@@ -66,7 +66,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function get($name, $default = null)
+    public function get(string $name, $default = null)
     {
         if ('user' === $name) {
             $now     = time();
@@ -95,7 +95,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function remove($name)
+    public function remove(string $name): void
     {
         if (isset($_SESSION['shield.'.$this->name][$name])) {
             unset($_SESSION['shield.'.$this->name][$name]);
@@ -105,7 +105,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $_SESSION['shield.'.$this->name] = [];
     }
@@ -113,7 +113,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function isShielded(ServerRequestInterface $request)
+    public function isShielded(ServerRequestInterface $request): bool
     {
         $match = $this->getPatternMatch($request);
 
@@ -123,7 +123,7 @@ class Context implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function getPatternMatch(ServerRequestInterface $request)
+    public function getPatternMatch(ServerRequestInterface $request): array
     {
         $path = $request->getUri()->getPath();
         foreach ($this->paths as $pattern => $roles) {
@@ -144,7 +144,7 @@ class Context implements ContextInterface
      *
      * @return mixed[]
      */
-    protected function getDefaultConfig()
+    protected function getDefaultConfig(): array
     {
         return [
             // Whether or not this is the default context.

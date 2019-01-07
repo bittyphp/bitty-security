@@ -35,7 +35,7 @@ class EncoderCollection
      *
      * @throws SecurityException
      */
-    public function addEncoder(EncoderInterface $encoder, $userClass)
+    public function addEncoder(EncoderInterface $encoder, string $userClass): void
     {
         if (!class_exists($userClass) && !interface_exists($userClass)) {
             throw new SecurityException(
@@ -55,7 +55,7 @@ class EncoderCollection
      *
      * @throws SecurityException
      */
-    public function getEncoder(UserInterface $user)
+    public function getEncoder(UserInterface $user): EncoderInterface
     {
         foreach ($this->encoders as $class => $encoder) {
             if ($user instanceof $class) {

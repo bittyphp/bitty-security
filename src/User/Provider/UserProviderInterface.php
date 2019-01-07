@@ -18,5 +18,5 @@ interface UserProviderInterface
      *
      * @return UserInterface|null
      */
-    public function getUser($username);
+    public function getUser(string $username): ?UserInterface;
 }
