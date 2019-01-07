@@ -455,7 +455,7 @@ Encoders both encode and verify passwords. There are three encoders that come wi
 
 #### PlainTextEncoder
 
-The `PlainTextEncoder`, as you may have guessed, doesn't actually encode a password; it simply returns password as it was received. It comes in handy when testing the authentication system, but is definitely not recommended for real world use.
+The `PlainTextEncoder`, as you may have guessed, doesn't actually encode a password; it simply returns the password as it was received. It comes in handy when testing the authentication system, but is definitely not recommended for real world use.
 
 ```php
 <?php
