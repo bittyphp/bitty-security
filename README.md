@@ -11,6 +11,10 @@ The best part? It does all this in a fairly tiny package.
 
 For those interested, Bitty uses a [role-based access control (RBAC)](https://en.wikipedia.org/wiki/Role-based_access_control) security model.
 
+## Work In Progress
+
+This is still a work in progress. The authentication side is done, but the authorization side isn't. It needs code for determining if a user is authorized to perform a given action.
+
 ## Installation
 
 It's best to install using [Composer](https://getcomposer.org/).
