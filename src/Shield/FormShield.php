@@ -79,7 +79,7 @@ class FormShield extends AbstractShield
             return null;
         }
 
-        $user = $this->authenticate($username, $password);
+        $this->authenticate($username, $password);
 
         $target = $this->config['login.target'];
         if ($this->config['login.use_referrer']) {
