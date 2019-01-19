@@ -44,7 +44,7 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     public function setContainer(PsrContainerInterface $container = null): void
     {
         if ($container instanceof ContainerInterface) {
-            $container->register([new ContextMapServiceProvider()]);
+            $container->register(new ContextMapServiceProvider());
 
             $contextMap = $container->get('security.context');
             $contextMap->add($this->shield->getContext());

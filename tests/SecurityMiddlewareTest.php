@@ -75,16 +75,11 @@ class SecurityMiddlewareTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $spy = self::once();
-        $container->expects($spy)->method('register');
+        $container->expects(self::once())
+            ->method('register')
+            ->with(self::isInstanceOf(ContextMapServiceProvider::class));
 
         $this->fixture->setContainer($container);
-
-        $actual = $spy->getInvocations()[0]->getParameters()[0];
-
-        self::assertIsArray($actual);
-        self::assertCount(1, $actual);
-        self::assertInstanceOf(ContextMapServiceProvider::class, $actual[0]);
     }
 
     public function testSetContainerAddsContextToMap(): void
