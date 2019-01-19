@@ -1,9 +1,9 @@
 # Bitty Security
 
-[![Build Status](https://travis-ci.org/bittyphp/bitty-security.svg?branch=master)](https://travis-ci.org/bittyphp/bitty-security)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/455fb9c687074e9185168f4ec216c7bf)](https://www.codacy.com/app/bittyphp/bitty-security)
-[![Total Downloads](https://poser.pugx.org/bittyphp/bitty-security/downloads)](https://packagist.org/packages/bittyphp/bitty-security)
-[![License](https://poser.pugx.org/bittyphp/bitty-security/license)](https://packagist.org/packages/bittyphp/bitty-security)
+[![Build Status](https://travis-ci.org/bittyphp/security.svg?branch=master)](https://travis-ci.org/bittyphp/security)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/455fb9c687074e9185168f4ec216c7bf)](https://www.codacy.com/app/bittyphp/security)
+[![Total Downloads](https://poser.pugx.org/bittyphp/security/downloads)](https://packagist.org/packages/bittyphp/security)
+[![License](https://poser.pugx.org/bittyphp/security/license)](https://packagist.org/packages/bittyphp/security)
 
 Bitty supports multiple security layers, covering multiple secured areas, with different authentication methods, using multiple user providers, with multiple password encoders, and supports different authorization strategies for each area. That's a whole lot of security!
 
@@ -20,7 +20,7 @@ This is still a work in progress. The authentication side is done, but the autho
 It's best to install using [Composer](https://getcomposer.org/).
 
 ```sh
-$ composer require bittyphp/bitty-security
+$ composer require bittyphp/security
 ```
 
 ## Setup
