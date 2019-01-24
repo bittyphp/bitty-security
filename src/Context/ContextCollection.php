@@ -10,7 +10,7 @@ class ContextCollection implements ContextInterface
     /**
      * @var ContextInterface[]
      */
-    protected $contexts = null;
+    protected $contexts = [];
 
     /**
      * @var ContextInterface|null

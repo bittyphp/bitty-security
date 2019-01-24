@@ -13,7 +13,7 @@ class Context implements ContextInterface
     protected $name = null;
 
     /**
-     * @var string[]
+     * @var array[]
      */
     protected $paths = null;
 
@@ -24,7 +24,7 @@ class Context implements ContextInterface
 
     /**
      * @param string $name
-     * @param string[] $paths
+     * @param array[] $paths Formatted as [pattern => [role, ...]]
      * @param mixed[] $config
      */
     public function __construct(string $name, array $paths, array $config = [])
