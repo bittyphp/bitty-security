@@ -28,7 +28,7 @@ class User implements UserInterface
 
     /**
      * @param string $username
-     * @param string $password
+     * @param string $password The password in encoded form.
      * @param string|null $salt
      * @param string[] $roles
      */
@@ -45,13 +45,11 @@ class User implements UserInterface
     }
 
     /**
-     * Only serialize non-sensitive data.
-     *
      * @return string[]
      */
     public function __sleep(): array
     {
-        return ['username', 'roles'];
+        return ['username', 'password', 'salt', 'roles'];
     }
 
     /**
