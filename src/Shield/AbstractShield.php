@@ -5,6 +5,7 @@ namespace Bitty\Security\Shield;
 use Bitty\Container\ContainerAwareInterface;
 use Bitty\Container\ContainerAwareTrait;
 use Bitty\EventManager\EventInterface;
+use Bitty\EventManager\EventManagerInterface;
 use Bitty\Security\Authentication\AuthenticatorInterface;
 use Bitty\Security\Authorization\AuthorizerInterface;
 use Bitty\Security\Context\ContextInterface;
@@ -96,6 +97,9 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
         }
 
         $eventManager = $this->container->get('event.manager');
+        if (!$eventManager instanceof EventManagerInterface) {
+            return;
+        }
 
         return $eventManager->trigger($event, $target, $params);
     }
