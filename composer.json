@@ -1,7 +1,7 @@
 {
     "name": "bittyphp/security",
     "type": "library",
-    "description": "Security middleware.",
+    "description": "Flexible security middleware.",
     "license": "MIT",
     "authors": [
         {
