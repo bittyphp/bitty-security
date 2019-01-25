@@ -50,7 +50,7 @@ $app->add(
 
 ### Accessing the Security Context
 
-At some point, you'll probably need access to the security context to determine who is logged in. Bitty registers a `security.context` service with the container automatically when you add the security middleware. If a different security context has already been defined, it will NOT overwrite it. You can use the security context to see who is logged in.
+At some point, you'll probably need access to the security context to determine who is logged in. The middleware registers a `security.context` service with the container automatically when you add the security middleware. If a different security context has already been defined, it will NOT overwrite it. You can use the security context to see who is logged in.
 
 Even if you use multiple shields and each shield has a separate user, the security context will determine which user is being used based on the request given and return that user.
 
@@ -160,9 +160,9 @@ $eventManager->attach(
 
 ## Shields
 
-Bitty uses "shields" to protect secure areas from unauthorized access. One or multiple shields can be in place to protect the areas you want to secure. For example, you can have one shield to grant basic access and a completely separate shield to restrict access to an administration area. Multiple users can be logged into the separate areas at the same time. Or you can use one shield to secure both areas, but require different authorization for each area. It's all up to you.
+"Shields" are used to protect secure areas from unauthorized access. One or multiple shields can be in place to protect the areas you want to secure. For example, you can have one shield to grant basic access and a completely separate shield to restrict access to an administration area. Multiple users can be logged into the separate areas at the same time. Or you can use one shield to secure both areas, but require different authorization for each area. It's all up to you.
 
-Bitty comes with two built-in shields for granting access: an HTTP Basic shield and a form-based login shield. Not enough? No worries, you can use `Bitty\Security\Shield\ShieldInterface` or extend `Bitty\Security\Shield\AbstractShield` to grant access using any method you want. For example, you could build an `AuthTokenShield` to grant access using an API token or a `NetworkShield` to only allow certain IP ranges.
+There are two built-in shields for granting access: an HTTP Basic shield and a form-based login shield. Not enough? No worries, you can use `Bitty\Security\Shield\ShieldInterface` or extend `Bitty\Security\Shield\AbstractShield` to grant access using any method you want. For example, you could build an `AuthTokenShield` to grant access using an API token or a `NetworkShield` to only allow certain IP ranges.
 
 ### Basic Usage
 
@@ -289,7 +289,7 @@ $myShield = new HttpBasicShield(
 
 Each shield has its own security context to define which area(s) to secure and to keep track of who is logged in. The context is automatically added to the `ContextMap` of the `SecurityMiddleware`. This allows the security layer to determine who is logged in even if you have multiple shields configured.
 
-Bitty only comes with a session-based security context. Don't want to track users that way? No problemo! You can create your own security context by implementing `Bitty\Security\Context\ContextInterface`. For example, if you were to create an API token shield, you'd probably want to make an `InMemoryContext` so that authentication doesn't persist on subsequent requests.
+This middleware only comes with a session-based security context. Don't want to track users that way? No problemo! You can create your own security context by implementing `Bitty\Security\Context\ContextInterface`. For example, if you were to create an API token shield, you'd probably want to make an `InMemoryContext` so that authentication doesn't persist on subsequent requests.
 
 ### Basic Usage
 
@@ -381,7 +381,7 @@ Another option is to create a custom context by overwriting `Context::getDefault
 
 The built-in authentication supports any number of user providers which can all use the same password encoder or different classes of users can use different encoders.
 
-Bitty only comes with an `InMemoryUserProvider`. You'll most likely want to load users from a database, so you'll have to build a custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`. The [User Providers](#user-providers) section goes into more detail on how to create custom providers.
+This middleware only comes with an `InMemoryUserProvider`. You'll most likely want to load users from a database, so you'll have to build a custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`. The [User Providers](#user-providers) section goes into more detail on how to create custom providers.
 
 ### Basic Usage
 
@@ -462,7 +462,7 @@ $authenticator = new Authenticator(
 
 ### User Providers
 
-All users are loaded using a user provider. However, the only user provider that comes with Bitty is the `Bitty\Security\User\Provider\InMemoryUserProvider`. Luckily, we can build any sort of custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`.
+All users are loaded using a user provider. However, the only user provider included is `Bitty\Security\User\Provider\InMemoryUserProvider`. Luckily, we can build any sort of custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`.
 
 #### Creating a Custom User
 
@@ -535,7 +535,7 @@ class MyDatabaseUserProvider implements UserProviderInterface
 
 ### Encoders
 
-Encoders both encode and verify passwords. There are three encoders that come with Bitty that should handle most needs: `PlainTextEncoder`, `MessageDigestEncoder`, and the `BcryptEncoder` (recommended default).
+Encoders both encode and verify passwords. There are three encoders included that should handle most needs: `PlainTextEncoder`, `MessageDigestEncoder`, and the `BcryptEncoder` (recommended default).
 
 #### PlainTextEncoder
 
