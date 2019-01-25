@@ -17,7 +17,7 @@ class FormShield extends AbstractShield
     {
         $path = $request->getUri()->getPath();
 
-        if ($path === $this->config['login.path']) {
+        if ($path === $this->config['login.path_post']) {
             return $this->handleFormLogin($request);
         }
 
@@ -96,12 +96,28 @@ class FormShield extends AbstractShield
     protected function getDefaultConfig(): array
     {
         return [
+            // Path to the login page.
             'login.path' => '/login',
+
+            // Path to the login POST.
+            'login.path_post' => '/login',
+
+            // Path to go to after logging in, unless use_referrer is enabled.
             'login.target' => '/',
+
+            // Name of element to get username from.
             'login.username' => 'username',
+
+            // Name of element to get password from.
             'login.password' => 'password',
+
+            // Whether or not to redirect to the referring page after login.
             'login.use_referrer' => true,
+
+            // Path to the logout page.
             'logout.path' => '/logout',
+
+            // Path to go to after logging out.
             'logout.target' => '/',
         ];
     }
