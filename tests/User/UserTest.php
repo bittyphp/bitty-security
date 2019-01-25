@@ -83,6 +83,6 @@ class UserTest extends TestCase
 
         $actual = $fixture->__sleep();
 
-        self::assertEquals(['username', 'roles'], $actual);
+        self::assertEquals(['username', 'password', 'salt', 'roles'], $actual);
     }
 }

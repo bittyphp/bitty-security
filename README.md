@@ -6,11 +6,11 @@
 [![Total Downloads](https://poser.pugx.org/bittyphp/security/downloads)](https://packagist.org/packages/bittyphp/security)
 [![License](https://poser.pugx.org/bittyphp/security/license)](https://packagist.org/packages/bittyphp/security)
 
-Bitty supports multiple security layers, covering multiple secured areas, with different authentication methods, using multiple user providers, with multiple password encoders, and supports different authorization strategies for each area. That's a whole lot of security!
+Bitty's security component is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware that supports multiple security layers, covering multiple secured areas, with different authentication methods, using multiple user providers, with multiple password encoders, and supports different authorization strategies for each area. That's a whole lot of security!
 
-The best part? It does all this in a fairly tiny package.
+The best part? It does all this in a fairly tiny package and it can be used in any framework that supports PSR-15.
 
-For those interested, Bitty uses a [role-based access control (RBAC)](https://en.wikipedia.org/wiki/Role-based_access_control) security model.
+For those interested, this component uses a [role-based access control (RBAC)](https://en.wikipedia.org/wiki/Role-based_access_control) security model.
 
 ## Work In Progress
 
@@ -50,9 +50,11 @@ $app->add(
 
 ### Accessing the Security Context
 
-At some point, you'll probably need access to the security context to determine who is logged in. Bitty registers a `security.context` service with the container automatically when you add the security middleware. If a different security context has already been defined, it will NOT overwrite it. You can use the security context to see who is logged in.
+At some point, you'll probably need access to the security context to determine who is logged in. The middleware registers a `security.context` service with the container automatically when you add the security middleware. If a different security context has already been defined, it will NOT overwrite it. You can use the security context to see who is logged in.
 
 Even if you use multiple shields and each shield has a separate user, the security context will determine which user is being used based on the request given and return that user.
+
+If using outside of Bitty, the `security.context` service will not be created. See [Custom Security Context](#custom-security-context) for how to create pass in your own.
 
 ```php
 <?php
@@ -83,34 +85,37 @@ If you want to use a custom security context, you can manually create one and pa
 ```php
 <?php
 
-use Bitty\Application;
 use Bitty\Security\Context\ContextMap;
 use Bitty\Security\SecurityMiddleware;
 use Bitty\Security\Shield\FormShield;
-
-$app = new Application();
+use Bitty\Security\User\UserInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 // Define your context.
+// You can register this as a service in your container for easier access.
 $myContext = new ContextMap();
 
-$app->add(
-    new SecurityMiddleware(
-        new FormShield(...),
-        // Pass your context in.
-        $myContext
-    )
+$security = new SecurityMiddleware(
+    new FormShield(...),
+    // Pass your context in.
+    $myContext
 );
 
-$request = $app->getContainer()->get('request');
+/** @var ServerRequestInterface */
+$request = ...;
 
-// See who is logged in.
+/** @var UserInterface|null */
 $user = $myContext->getUser($request);
 
 ```
 
 ## Security Events
 
-The security system triggers events for the following actions. You can use the `EventManager` to create a listener for the events of your choosing and perform additional security measures. Some examples of things you could do are: logging authentication requests, counting authentication failures to raise security, or sending an email or SMS alert when someone's account logs in from an unknown location.
+If used within the Bitty application, the security system triggers events for the following actions. You can use `Bitty\EventManager\EventManager` to create a listener for the events of your choosing and perform additional security measures. Some examples of things you could do are: logging authentication requests, counting authentication failures to raise security, or sending an email or SMS alert when someone's account logs in from an unknown location.
+
+If used outside of Bitty, it will only emit events if the container is set and contains a `event.manager` service that implements `Bitty\EventManager\EventManagerInterface`.
+
+Once [PSR-14](https://github.com/php-fig/fig-standards/blob/master/proposed/event-dispatcher.md) gets finalized, it will switch to those interfaces.
 
 | Event                           | Target          | Parameters                                  | When                          |
 |---------------------------------|-----------------|---------------------------------------------|-------------------------------|
@@ -124,7 +129,7 @@ The security system triggers events for the following actions. You can use the `
 
 ### Example Listener
 
-Here's an example listener that monitors for authentication failures and simply logs them as errors. Check out the Event Manager documentation if you want more information on creating an event listener.
+Here's an example listener that monitors for authentication failures and simply logs them as errors. Check out the [Event Manager](https://github.com/bittyphp/event-manager) documentation if you want more information on creating an event listener.
 
 ```php
 <?php
@@ -138,7 +143,7 @@ $logger = $app->getContainer()->get('my.logger');
 
 $eventManager = $app->getContainer()->get('event.manager');
 $eventManager->attach(
-    'security.authorization.failure',
+    'security.authentication.failure',
     function (EventInterface $event) use ($logger) {
         $params = $event->getParams();
 
@@ -155,13 +160,13 @@ $eventManager->attach(
 
 ## Shields
 
-Bitty uses "shields" to protect secure areas from unauthorized access. One or multiple shields can be in place to protect the areas you want to secure. For example, you can have one shield to grant basic access and a completely separate shield to restrict access to an administration area. Multiple users can be logged into the separate areas at the same time. Or you can use one shield to secure both areas, but require different authorization for each area. It's all up to you.
+"Shields" are used to protect secure areas from unauthorized access. One or multiple shields can be in place to protect the areas you want to secure. For example, you can have one shield to grant basic access and a completely separate shield to restrict access to an administration area. Multiple users can be logged into the separate areas at the same time. Or you can use one shield to secure both areas, but require different authorization for each area. It's all up to you.
 
-Bitty comes with two built-in shields for granting access: an HTTP Basic shield and a form-based login shield. Not enough? No worries, you can use the `ShieldInterface` or extend the `AbstractShield` to grant access using any method you want. For example, you could build an `AuthTokenShield` to grant access using an API token or a `NetworkShield` to only allow certain IP ranges.
+There are two built-in shields for granting access: an HTTP Basic shield and a form-based login shield. Not enough? No worries, you can use `Bitty\Security\Shield\ShieldInterface` or extend `Bitty\Security\Shield\AbstractShield` to grant access using any method you want. For example, you could build an `AuthTokenShield` to grant access using an API token or a `NetworkShield` to only allow certain IP ranges.
 
 ### Basic Usage
 
-Each shield is designed to have its own security context, authentication method, authorization strategy, and configuration options. However, you can share any part of that with another shield simply by passing in the same object to both shields.
+Each shield is designed to have its own security context, authentication method, authorization strategy, and configuration options. However, you can share any part of that with another shield simply by passing in the same context object to both shields.
 
 ```php
 <?php
@@ -206,11 +211,85 @@ $myShield = new ShieldCollection(
 
 You can get even more advanced by stacking a `ShieldCollection` inside another `ShieldCollection`. Or if you set up the shields inside a collection to share the same context, they can become really strong layers of security. For example, you could build a `NetworkShield` to block access based on IP address and then have a `FormShield` show up only for users with a valid IP. As long as both shields have the same context, they will both protect the same area.
 
+### The `FormShield`
+
+The `FormShield` allows you to secure an area using an HTML form. You can customize the login and logout paths, what field names to use, where to go after login and logout, and whether or not to redirect back to the referrer.
+
+Here is an example that shows the available options:
+
+```php
+<?php
+
+use Bitty\Security\Authentication\Authenticator;
+use Bitty\Security\Authorization\Authorizer;
+use Bitty\Security\Context\Context;
+use Bitty\Security\Shield\FormShield;
+
+$myShield = new FormShield(
+    new Context(...),
+    new Authenticator(...),
+    new Authorizer(...),
+    [
+        'login.path' => '/login',
+        'login.path_post' => '/login',
+        'login.target' => '/',
+        'login.username' => 'username',
+        'login.password' => 'password',
+        'login.use_referrer' => true,
+        'logout.path' => '/logout',
+        'logout.target' => '/',
+    ]
+);
+```
+
+#### Options
+
+- **login.path** - The route to the login page. Defaults to `/login`.
+
+- **login.path_post** - The route to where the login page POSTs data. The data **must** be in a POST request. Defaults to `/login`.
+
+- **login.target** - Where to redirect after login. Defaults to `/`. If `login.use_referrer` is enabled, that will take precedence.
+
+- **login.username** - The HTML input name to get the username from. Defaults to `username`.
+
+- **login.password** - The HTML input name to get the password from. Defaults to `password`.
+
+- **login.use_referrer** - Whether or not to redirect the user back to the page they came from after login. Defaults to `true`. This does not use the referrer HTTP header. The referrer value will be the secured path that was requested before being redirected to the login page.
+
+- **logout.path** - The route to the logout page. Defaults to `/logout`.
+
+- **logout.target** - Where to redirect after logout. Defaults to `/`.
+
+### The `HttpBasicShield`
+
+The `HttpBasicShield` allows you to secure an area using HTTP's [Basic authentication scheme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#Basic_authentication_scheme).
+
+Here is an example that shows the available options:
+
+```php
+<?php
+
+use Bitty\Security\Authentication\Authenticator;
+use Bitty\Security\Authorization\Authorizer;
+use Bitty\Security\Context\Context;
+use Bitty\Security\Shield\HttpBasicShield;
+
+$myShield = new HttpBasicShield(
+    new Context(...),
+    new Authenticator(...),
+    new Authorizer(...),
+    [
+        // The name of your secured area.
+        'realm' => 'My Secured Area',
+    ]
+);
+```
+
 ## Context
 
 Each shield has its own security context to define which area(s) to secure and to keep track of who is logged in. The context is automatically added to the `ContextMap` of the `SecurityMiddleware`. This allows the security layer to determine who is logged in even if you have multiple shields configured.
 
-Bitty only comes with a session-based security context. Don't want to track users that way? No problemo! You can create your own security context by using the `ContextInterface`. For example, if you were to create an API token shield, you'd probably want to make an `InMemoryContext` so that authentication doesn't persist on subsequent requests.
+This middleware only comes with a session-based security context. Don't want to track users that way? No problemo! You can create your own security context by implementing `Bitty\Security\Context\ContextInterface`. For example, if you were to create an API token shield, you'd probably want to make an `InMemoryContext` so that authentication doesn't persist on subsequent requests.
 
 ### Basic Usage
 
@@ -241,7 +320,7 @@ $context = new Context(
     'my_secure_area',
     [
         // Allow anyone to access /admin/login
-        '^/admin/login$' => [],
+        '^/admin/login' => [],
 
         // Restrict all other /admin/ access to user's with ROLE_ADMIN
         '^/admin/' => ['ROLE_ADMIN'],
@@ -256,7 +335,7 @@ $context = new Context(
         '^/admin/' => ['ROLE_ADMIN'],
 
         // Now no one can log in.
-        '^/admin/login$' => [],
+        '^/admin/login' => [],
     ]
 );
 ```
@@ -302,7 +381,7 @@ Another option is to create a custom context by overwriting `Context::getDefault
 
 The built-in authentication supports any number of user providers which can all use the same password encoder or different classes of users can use different encoders.
 
-Bitty only comes with an `InMemoryUserProvider`. You'll most likely want to load users from a database, so you'll have to build a custom user provider using the `UserProviderInterface`. The User Provider section goes into more detail on how to create custom providers.
+This middleware only comes with an `InMemoryUserProvider`. You'll most likely want to load users from a database, so you'll have to build a custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`. The [User Providers](#user-providers) section goes into more detail on how to create custom providers.
 
 ### Basic Usage
 
@@ -340,7 +419,7 @@ $authenticator = new Authenticator(
 
 ### Advanced Usage
 
-You may also want to load users from different sources and each source might need to use a different password encoder. No worries, there's a class for that. We'll simply create a `UserProviderCollection` and the authentication layer will look for a user from each user provider until it finds one.
+You may also want to load users from different sources and each source might need to use a different password encoder. No worries, there's a class for that. We'll simply create a `Bitty\Security\User\Provider\UserProviderCollection` and the authentication layer will look for a user from each user provider in the collection until it finds one.
 
 Once it does find a user, it will look at the list of encoders to determine how to encode the password for the specific type of user that was returned.
 
@@ -383,11 +462,11 @@ $authenticator = new Authenticator(
 
 ### User Providers
 
-All users are loaded using a user provider. However, the only user provider that comes with Bitty is the `InMemoryUserProvider`. Luckily, we can build any sort of custom user provider using the `UserProviderInterface`.
+All users are loaded using a user provider. However, the only user provider included is `Bitty\Security\User\Provider\InMemoryUserProvider`. Luckily, we can build any sort of custom user provider using `Bitty\Security\User\Provider\UserProviderInterface`.
 
 #### Creating a Custom User
 
-Each user provider is expected to return an instance of `UserInterface`. If we want to make our own user provider, we'll first have to make a user it can return.
+Each user provider is expected to return an instance of `Bitty\Security\User\UserInterface`. If we want to make our own user provider, we'll first have to make a user it can return.
 
 The user object is stored in the session, so the less data there is to store, the better. Other than the interface methods, you may want to define a `__sleep` or `__wakeup` method to define what properties are safe to store in the session.
 
@@ -401,20 +480,20 @@ class MyUser implements UserInterface
     // ...
 
     /**
-     * Only serialize non-sensitive data.
+     * At a minimum, this needs to contain the username, password, and salt.
      *
      * @return string[]
      */
     public function __sleep()
     {
-        return ['id', 'username', 'roles'];
+        return ['id', 'username', 'password', 'salt', 'roles'];
     }
 }
 ```
 
 #### Creating a Custom User Provider
 
-Now that we have a user, we'll need to make a way of loading it. That's where the `UserProviderInterface` comes in. Alternatively, you can extend the `AbstractUserProvider`, but it is not required.
+Now that we have a user, we'll need to make a way of loading it. That's where `Bitty\Security\User\Provider\UserProviderInterface` comes in. Alternatively, you can extend `Bitty\Security\User\Provider\AbstractUserProvider`, but it is not required.
 
 In this example, we're going to build a very basic database user provider.
 
@@ -434,7 +513,7 @@ class MyDatabaseUserProvider implements UserProviderInterface
         $this->db = new \PDO('mysql:host='.$host.';dbname='.$db, $user, $pass);
     }
 
-    public function getUser($username)
+    public function getUser(string $username): ?UserInterface
     {
         // Protect against absurdly long usernames.
         if (strlen($username) > UserProviderInterface::MAX_USERNAME_LEN) {
@@ -456,11 +535,11 @@ class MyDatabaseUserProvider implements UserProviderInterface
 
 ### Encoders
 
-Encoders both encode and verify passwords. There are three encoders that come with Bitty that should handle most needs: `PlainTextEncoder`, `MessageDigestEncoder`, and the `BcryptEncoder` (recommended default).
+Encoders both encode and verify passwords. There are three encoders included that should handle most needs: `PlainTextEncoder`, `MessageDigestEncoder`, and the `BcryptEncoder` (recommended default).
 
 #### PlainTextEncoder
 
-The `PlainTextEncoder`, as you may have guessed, doesn't actually encode a password; it simply returns the password as it was received. It comes in handy when testing the authentication system, but is definitely not recommended for real world use.
+The `PlainTextEncoder`, as you may have guessed, doesn't actually encode a password; it simply returns the password as it was received. It comes in handy when testing the authentication system, but is definitely **not recommended** for real world use.
 
 ```php
 <?php
@@ -504,7 +583,7 @@ $encoder->encode('password');
 
 #### Custom Encoders
 
-If the default encoders aren't enough, you can also build your own using the `EncoderInterface` or by extending the `AbstractEncoder`. For example, if you're using PHP 7.2+, you could make an Argon2 encoder. This is the hashing function recommended by the [Open Web Application Security Project (OWASP)](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet).
+If the default encoders aren't enough, you can also build your own using `Bitty\Security\Encoder\EncoderInterface` or by extending `Bitty\Security\Encoder\AbstractEncoder`. For example, if you're using PHP 7.2+, you could make an Argon2 encoder. This is the hashing function recommended by the [Open Web Application Security Project (OWASP)](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet).
 
 ## Authorization
 
