@@ -57,6 +57,19 @@ class Authenticator implements AuthenticatorInterface
      */
     public function reloadUser(UserInterface $user): ?UserInterface
     {
-        return $this->userProvider->getUser($user->getUsername());
+        $freshUser = $this->userProvider->getUser($user->getUsername());
+        if (!$freshUser) {
+            return null;
+        }
+
+        if ($freshUser->getSalt() !== $user->getSalt()) {
+            return null;
+        }
+
+        if ($freshUser->getPassword() !== $user->getPassword()) {
+            return null;
+        }
+
+        return $freshUser;
     }
 }

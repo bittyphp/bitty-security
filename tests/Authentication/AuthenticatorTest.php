@@ -130,14 +130,42 @@ class AuthenticatorTest extends TestCase
 
     public function testReloadUserReturnsUser(): void
     {
-        $userA = $this->createUser();
-        $userB = $this->createUser();
+        $hash  = uniqid();
+        $salt  = uniqid();
+        $userA = $this->createUser(uniqid(), $hash, $salt);
+        $userB = $this->createUser(uniqid(), $hash, $salt);
 
         $this->userProvider->method('getUser')->willReturn($userB);
 
         $actual = $this->fixture->reloadUser($userA);
 
         self::assertSame($userB, $actual);
+    }
+
+    public function testReloadUserWithMismatchSalts(): void
+    {
+        $hash  = uniqid();
+        $userA = $this->createUser(uniqid(), $hash, uniqid());
+        $userB = $this->createUser(uniqid(), $hash, uniqid());
+
+        $this->userProvider->method('getUser')->willReturn($userB);
+
+        $actual = $this->fixture->reloadUser($userA);
+
+        self::assertNull($actual);
+    }
+
+    public function testReloadUserWithMismatchPasswords(): void
+    {
+        $salt  = uniqid();
+        $userA = $this->createUser(uniqid(), uniqid(), $salt);
+        $userB = $this->createUser(uniqid(), uniqid(), $salt);
+
+        $this->userProvider->method('getUser')->willReturn($userB);
+
+        $actual = $this->fixture->reloadUser($userA);
+
+        self::assertNull($actual);
     }
 
     /**
