@@ -108,7 +108,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      * Authenticates a user.
      *
      * @param string $username
-     * @param string $password
+     * @param string $password Plain text password.
      *
      * @return UserInterface
      *
@@ -143,7 +143,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      * Authorizes a user.
      *
      * @param UserInterface $user
-     * @param string[] $roles
+     * @param string[] $roles Roles to authorize against.
      *
      * @throws AuthorizationException
      */

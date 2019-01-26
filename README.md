@@ -54,7 +54,7 @@ At some point, you'll probably need access to the security context to determine 
 
 Even if you use multiple shields and each shield has a separate user, the security context will determine which user is being used based on the request given and return that user.
 
-If using outside of Bitty, the `security.context` service will not be created. See [Custom Security Context](#custom-security-context) for how to create pass in your own.
+If using outside of Bitty, the `security.context` service will not be created. See [Custom Security Context](#custom-security-context) for how to pass in your own.
 
 ```php
 <?php
