@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "12f5e7a0cd696d6b3bd0e76a9d2959d6",
+    "content-hash": "ccaee3b82e9688dac127dab7c1873e23",
     "packages": [
         {
             "name": "bittyphp/collection",
@@ -265,6 +265,54 @@
             ],
             "description": "PSR-15 HTTP Middleware implementation.",
             "time": "2019-01-19T23:10:57+00:00"
+        },
+        {
+            "name": "bittyphp/session",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bittyphp/session.git",
+                "reference": "397cb78392513b42369e36b664bd5e15910a8aba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bittyphp/session/zipball/397cb78392513b42369e36b664bd5e15910a8aba",
+                "reference": "397cb78392513b42369e36b664bd5e15910a8aba",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "jakub-onderka/php-parallel-lint": "^1.0",
+                "localheinz/composer-normalize": "^1.1",
+                "phing/phing": "^2.16",
+                "phpstan/phpstan": "^0.10.7",
+                "phpstan/phpstan-deprecation-rules": "^0.10.2",
+                "phpstan/phpstan-phpunit": "^0.10.0",
+                "phpstan/phpstan-strict-rules": "^0.10.1",
+                "phpunit/phpunit": "^7.0",
+                "squizlabs/php_codesniffer": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Bitty\\Http\\Session\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luke Kingsley",
+                    "email": "bizurkur@gmail.com"
+                }
+            ],
+            "description": "Session management with secure defaults.",
+            "time": "2019-01-27T01:57:34+00:00"
         },
         {
             "name": "container-interop/service-provider",
@@ -3936,8 +3984,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "bittyphp/session": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
