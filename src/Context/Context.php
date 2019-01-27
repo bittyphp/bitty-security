@@ -2,11 +2,17 @@
 
 namespace Bitty\Security\Context;
 
+use Bitty\Http\Session\SessionInterface;
 use Bitty\Security\Context\ContextInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Context implements ContextInterface
 {
+    /**
+     * @var SessionInterface
+     */
+    protected $session = null;
+
     /**
      * @var string
      */
@@ -23,15 +29,21 @@ class Context implements ContextInterface
     protected $config = null;
 
     /**
+     * @param SessionInterface $session
      * @param string $name
      * @param array[] $paths Formatted as [pattern => [role, ...]]
      * @param mixed[] $config
      */
-    public function __construct(string $name, array $paths, array $config = [])
-    {
-        $this->name   = $name;
-        $this->paths  = $paths;
-        $this->config = array_merge($this->getDefaultConfig(), $config);
+    public function __construct(
+        SessionInterface $session,
+        string $name,
+        array $paths,
+        array $config = []
+    ) {
+        $this->session = $session;
+        $this->name    = $name;
+        $this->paths   = $paths;
+        $this->config  = array_merge($this->getDefaultConfig(), $config);
     }
 
     /**
@@ -49,18 +61,15 @@ class Context implements ContextInterface
     {
         if ('user' === $name) {
             $now = time();
-            // TODO: Secure this more?
-            // http://php.net/manual/en/features.session.security.management.php#features.session.security.management.session-id-regeneration
-            // http://php.net/manual/en/function.session-regenerate-id.php
             $this->set('destroy', $now + $this->config['destroy.delay']);
-            session_regenerate_id();
+            $this->session->regenerate();
             $this->remove('destroy');
             $this->set('login', $now);
             $this->set('active', $now);
             $this->set('expires', $now + $this->config['ttl']);
         }
 
-        $_SESSION['shield.'.$this->name][$name] = $value;
+        $this->session->set($this->name.'/'.$name, $value);
     }
 
     /**
@@ -85,11 +94,7 @@ class Context implements ContextInterface
             }
         }
 
-        if (isset($_SESSION['shield.'.$this->name][$name])) {
-            return $_SESSION['shield.'.$this->name][$name];
-        }
-
-        return $default;
+        return $this->session->get($this->name.'/'.$name, $default);
     }
 
     /**
@@ -97,9 +102,7 @@ class Context implements ContextInterface
      */
     public function remove(string $name): void
     {
-        if (isset($_SESSION['shield.'.$this->name][$name])) {
-            unset($_SESSION['shield.'.$this->name][$name]);
-        }
+        $this->session->remove($this->name.'/'.$name);
     }
 
     /**
@@ -107,7 +110,11 @@ class Context implements ContextInterface
      */
     public function clear(): void
     {
-        $_SESSION['shield.'.$this->name] = [];
+        foreach ($this->session->all() as $key => $value) {
+            if (substr($key, 0, strlen($this->name.'/')) === $this->name.'/') {
+                $this->session->remove($key);
+            }
+        }
     }
 
     /**
@@ -161,7 +168,7 @@ class Context implements ContextInterface
             // Delay (in seconds) to wait before destroying an old session.
             // Sessions are flagged as "destroyed" during re-authentication.
             // Allows for a network lag in asynchronous applications.
-            'destroy.delay' => 300,
+            'destroy.delay' => 30,
         ];
     }
 }

@@ -2,8 +2,10 @@
 
 namespace Bitty\Tests\Security\Context;
 
+use Bitty\Http\Session\SessionInterface;
 use Bitty\Security\Context\Context;
 use Bitty\Security\Context\ContextInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -15,11 +17,24 @@ class ContextTest extends TestCase
      */
     protected $fixture = null;
 
+    /**
+     * @var string
+     */
+    protected $name = null;
+
+    /**
+     * @var SessionInterface|MockObject
+     */
+    protected $session = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fixture = new Context(uniqid(), []);
+        $this->name    = uniqid();
+        $this->session = $this->createMock(SessionInterface::class);
+
+        $this->fixture = new Context($this->session, $this->name, []);
     }
 
     public function testInstanceOf(): void
@@ -35,7 +50,7 @@ class ContextTest extends TestCase
      */
     public function testIsDefault(array $options, bool $expected): void
     {
-        $this->fixture = new Context(uniqid(), [], $options);
+        $this->fixture = new Context($this->session, uniqid(), [], $options);
 
         $actual = $this->fixture->isDefault();
 
@@ -85,137 +100,219 @@ class ContextTest extends TestCase
         $name  = uniqid();
         $value = uniqid();
 
+        $this->session->expects(self::once())
+            ->method('set')
+            ->with($this->name.'/'.$name, $value);
+
         $this->fixture->set($name, $value);
-
-        $actual = $this->fixture->get($name);
-
-        self::assertEquals($value, $actual);
     }
 
     public function testSetUser(): void
     {
-        $level = error_reporting();
-        error_reporting(0);
-
-        $ttl   = rand();
         $now   = time();
         $value = uniqid();
 
-        $this->fixture = new Context(uniqid(), [], ['ttl' => $ttl]);
+        $spy = self::exactly(7);
+        $this->session->expects($spy)->method(self::anything());
 
         $this->fixture->set('user', $value);
 
-        self::assertEquals($now, $this->fixture->get('login'), '', 1.0);
-        self::assertEquals($now, $this->fixture->get('active'), '', 1.0);
-        self::assertEquals($now + $ttl, $this->fixture->get('expires'), '', 1.0);
+        $actual = [];
+        foreach ($spy->getInvocations() as $invocation) {
+            $actual[] = [$invocation->getMethodName(), $invocation->getParameters()];
+        }
 
-        error_reporting($level);
+        $expected = [
+            ['set', [$this->name.'/destroy', $now + 30]],
+            ['regenerate', [false]],
+            ['remove', [$this->name.'/destroy']],
+            ['set', [$this->name.'/login', $now]],
+            ['set', [$this->name.'/active', $now]],
+            ['set', [$this->name.'/expires', $now + 86400]],
+            ['set', [$this->name.'/user', $value]],
+        ];
+        self::assertEquals($expected, $actual);
     }
 
-    public function testGetUserClearsDataWhenInactive(): void
+    public function testGet(): void
     {
-        $level = error_reporting();
-        error_reporting(0);
-
         $name    = uniqid();
         $default = uniqid();
+        $value   = uniqid();
 
-        $this->fixture = new Context(uniqid(), [], ['timeout' => -1]);
+        $this->session->expects(self::once())
+            ->method('get')
+            ->with($this->name.'/'.$name, $default)
+            ->willReturn($value);
 
-        $this->fixture->set('user', uniqid());
-        $this->fixture->set($name, uniqid());
+        $actual = $this->fixture->get($name, $default);
+
+        self::assertEquals($value, $actual);
+    }
+
+    /**
+     * @param string $name
+     * @param string $default
+     * @param string[] $data
+     * @param array[] $map
+     * @param array[] $expected
+     *
+     * @dataProvider sampleGetUserExpired
+     */
+    public function testGetUser(
+        string $name,
+        string $default,
+        array $data,
+        array $map,
+        array $expected
+    ): void {
+        $this->fixture = new Context($this->session, $name, [], ['timeout' => -1]);
+
+        $this->session->method('all')->willReturn($data);
+        $this->session->method('get')->willReturnMap($map);
+
+        $spy = self::exactly(count($expected));
+        $this->session->expects($spy)->method(self::anything());
+
+        $this->fixture->get('user', $default);
+
+        $actual = [];
+        foreach ($spy->getInvocations() as $invocation) {
+            $actual[] = [$invocation->getMethodName(), $invocation->getParameters()];
+        }
+
+        self::assertEquals($expected, $actual);
+    }
+
+    public function sampleGetUserExpired(): array
+    {
+        $now     = time();
+        $name    = uniqid();
+        $default = uniqid();
+        $keyA    = uniqid();
+        $keyB    = uniqid();
+        $data    = [
+            uniqid().'/'.uniqid() => uniqid(),
+            $name.'/'.$keyA => uniqid(),
+            uniqid().'/'.uniqid() => uniqid(),
+            $name.'/'.$keyB => uniqid(),
+            uniqid().'/'.uniqid() => uniqid(),
+        ];
+        $clear   = [
+            ['get', [$name.'/expires', 0]],
+            ['get', [$name.'/destroy', INF]],
+            ['get', [$name.'/active', 0]],
+            ['all', []],
+            ['remove', [$name.'/'.$keyA]],
+            ['remove', [$name.'/'.$keyB]],
+            ['get', [$name.'/user', $default]],
+        ];
+
+        return [
+            'is expired' => [
+                'name' => $name,
+                'default' => $default,
+                'data' => $data,
+                'map' => [
+                    [$name.'/expires', 0, $now - 1],
+                    [$name.'/destroy', INF, INF],
+                    [$name.'/active', 0, INF],
+                ],
+                'expected' => $clear,
+            ],
+            'is destroyed' => [
+                'name' => $name,
+                'default' => $default,
+                'data' => $data,
+                'map' => [
+                    [$name.'/expires', 0, INF],
+                    [$name.'/destroy', INF, $now - 1],
+                    [$name.'/active', 0, INF],
+                ],
+                'expected' => $clear,
+            ],
+            'is inactive' => [
+                'name' => $name,
+                'default' => $default,
+                'data' => $data,
+                'map' => [
+                    [$name.'/expires', 0, INF],
+                    [$name.'/destroy', INF, INF],
+                    [$name.'/active', 0, $now],
+                ],
+                'expected' => $clear,
+            ],
+            'not expired, destroyed, or inactive' => [
+                'name' => $name,
+                'default' => $default,
+                'data' => $data,
+                'map' => [
+                    [$name.'/expires', 0, INF],
+                    [$name.'/destroy', INF, INF],
+                    [$name.'/active', 0, INF],
+                ],
+                'expected' => [
+                    ['get', [$name.'/expires', 0]],
+                    ['get', [$name.'/destroy', INF]],
+                    ['get', [$name.'/active', 0]],
+                    ['set', [$name.'/active', $now]],
+                    ['get', [$name.'/user', $default]],
+                ],
+            ],
+        ];
+    }
+
+    public function testGetUserReturnsSessionResponse(): void
+    {
+        $default = uniqid();
+        $value   = uniqid();
+
+        $this->session->method('get')->willReturnMap(
+            [
+                [$this->name.'/user', $default, $value],
+            ]
+        );
 
         $actual = $this->fixture->get('user', $default);
 
-        self::assertEquals($default, $actual);
-
-        error_reporting($level);
-    }
-
-    public function testGetUserClearsDataWhenExpired(): void
-    {
-        $level = error_reporting();
-        error_reporting(0);
-
-        $name    = uniqid();
-        $default = uniqid();
-
-        $this->fixture = new Context(uniqid(), [], ['ttl' => -1]);
-
-        $this->fixture->set('user', uniqid());
-        $this->fixture->set($name, uniqid());
-
-        $actual = $this->fixture->get('user', $default);
-
-        self::assertEquals($default, $actual);
-
-        error_reporting($level);
-    }
-
-    public function testGetUserUpdatesActiveTime(): void
-    {
-        $now = time();
-
-        $this->fixture->set('expires', $now + rand(100, 999));
-        $this->fixture->set('active', $now - 86399);
-        $this->fixture->get('user', uniqid());
-
-        $actual = $this->fixture->get('active');
-
-        self::assertEquals($now, $actual, '', 1.0);
-    }
-
-    public function testGetUnsetValue(): void
-    {
-        $default = uniqid();
-
-        $actual = $this->fixture->get(uniqid(), $default);
-
-        self::assertEquals($default, $actual);
+        self::assertEquals($value, $actual);
     }
 
     public function testRemove(): void
     {
         $name = uniqid();
 
-        $this->fixture->set($name, uniqid());
+        $this->session->expects(self::once())
+            ->method('remove')
+            ->with($this->name.'/'.$name);
 
-        try {
-            $this->fixture->remove($name);
-        } catch (\Exception $e) {
-            self::fail();
-        }
-
-        self::assertTrue(true);
-    }
-
-    public function testRemoveUnsetValue(): void
-    {
-        try {
-            $this->fixture->remove(uniqid());
-        } catch (\Exception $e) {
-            self::fail();
-        }
-
-        self::assertTrue(true);
+        $this->fixture->remove($name);
     }
 
     public function testClear(): void
     {
-        $name    = uniqid();
-        $default = uniqid();
+        $keyA = uniqid();
+        $keyB = uniqid();
+        $data = [
+            uniqid().'/'.uniqid() => uniqid(),
+            $this->name.'/'.$keyA => uniqid(),
+            uniqid().'/'.uniqid() => uniqid(),
+            $this->name.'/'.$keyB => uniqid(),
+            uniqid().'/'.uniqid() => uniqid(),
+        ];
 
-        $this->fixture->set(uniqid(), uniqid());
-        $this->fixture->set(uniqid(), uniqid());
-        $this->fixture->set($name, uniqid());
-        $this->fixture->set(uniqid(), uniqid());
-        $this->fixture->set(uniqid(), uniqid());
+        $this->session->expects(self::once())
+            ->method('all')
+            ->willReturn($data);
+
+        $this->session->expects(self::exactly(2))
+            ->method('remove')
+            ->withConsecutive(
+                [$this->name.'/'.$keyA],
+                [$this->name.'/'.$keyB]
+            );
 
         $this->fixture->clear();
-
-        $actual = $this->fixture->get($name, $default);
-
-        self::assertEquals($default, $actual);
     }
 
     /**
@@ -229,7 +326,7 @@ class ContextTest extends TestCase
     {
         $request = $this->createRequest($path);
 
-        $this->fixture = new Context(uniqid(), $paths);
+        $this->fixture = new Context($this->session, uniqid(), $paths);
 
         $actual = $this->fixture->isShielded($request);
 
@@ -284,7 +381,7 @@ class ContextTest extends TestCase
     {
         $request = $this->createRequest($path);
 
-        $this->fixture = new Context($name, $paths);
+        $this->fixture = new Context($this->session, $name, $paths);
 
         $actual = $this->fixture->getPatternMatch($request);
 
