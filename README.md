@@ -173,11 +173,11 @@ Each shield is designed to have its own security context, authentication method,
 
 use Bitty\Security\Authentication\Authenticator;
 use Bitty\Security\Authorization\Authorizer;
-use Bitty\Security\Context\Context;
+use Bitty\Security\Context\SessionContext;
 use Bitty\Security\Shield\FormShield;
 
 $myShield = new FormShield(
-    new Context(...),
+    new SessionContext(...),
     new Authenticator(...),
     new Authorizer(...),
     $options
@@ -222,11 +222,11 @@ Here is an example that shows the available options:
 
 use Bitty\Security\Authentication\Authenticator;
 use Bitty\Security\Authorization\Authorizer;
-use Bitty\Security\Context\Context;
+use Bitty\Security\Context\SessionContext;
 use Bitty\Security\Shield\FormShield;
 
 $myShield = new FormShield(
-    new Context(...),
+    new SessionContext(...),
     new Authenticator(...),
     new Authorizer(...),
     [
@@ -271,11 +271,11 @@ Here is an example that shows the available options:
 
 use Bitty\Security\Authentication\Authenticator;
 use Bitty\Security\Authorization\Authorizer;
-use Bitty\Security\Context\Context;
+use Bitty\Security\Context\SessionContext;
 use Bitty\Security\Shield\HttpBasicShield;
 
 $myShield = new HttpBasicShield(
-    new Context(...),
+    new SessionContext(...),
     new Authenticator(...),
     new Authorizer(...),
     [
@@ -310,13 +310,17 @@ Since the pattern is a regex, you can get very specific - just make sure you esc
 
 Just remember, the first pattern that matches is the one used. So always put your "allow" statements at the top, then your "deny" statements. Ordering matters. If you do it wrong, you might block all access.
 
+For more information on setting up the session itself, see the [session documentation](https://github.com/bittyphp/session).
+
 ```php
 <?php
 
-use Bitty\Security\Context\Context;
+use Bitty\Http\Session\Session;
+use Bitty\Security\Context\SessionContext;
 
 // Do this!
-$context = new Context(
+$context = new SessionContext(
+    new Session(...),
     'my_secure_area',
     [
         // Allow anyone to access /admin/login
@@ -328,7 +332,8 @@ $context = new Context(
 );
 
 // DON'T do this.
-$context = new Context(
+$context = new SessionContext(
+    new Session(...),
     'my_secure_area',
     [
         // Restrict all /admin/ access to user's with ROLE_ADMIN
@@ -347,9 +352,11 @@ You can also control additional aspects of the security context by overriding so
 ```php
 <?php
 
-use Bitty\Security\Context\Context;
+use Bitty\Http\Session\Session;
+use Bitty\Security\Context\SessionContext;
 
-$context = new Context(
+$context = new SessionContext(
+    new Session(...),
     'my_secure_area',
     [
         // Your paths
@@ -375,7 +382,7 @@ $context = new Context(
 );
 ```
 
-Another option is to create a custom context by overwriting `Context::getDefaultConfig()`. You could then use your custom context in different shields or different applications and always have your desired defaults.
+Another option is to create a custom context by overwriting `SessionContext::getDefaultConfig()`. You could then use your custom context in different shields or different applications and always have your desired defaults.
 
 ## Authentication
 
