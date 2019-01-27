@@ -95,6 +95,22 @@ class SessionContextTest extends TestCase
         ];
     }
 
+    public function testSetCallsIsStarted(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(true);
+        $this->session->expects(self::never())->method('start');
+
+        $this->fixture->set(uniqid(), uniqid());
+    }
+
+    public function testSetStartsSession(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(false);
+        $this->session->expects(self::once())->method('start');
+
+        $this->fixture->set(uniqid(), uniqid());
+    }
+
     public function testSet(): void
     {
         $name  = uniqid();
@@ -112,17 +128,8 @@ class SessionContextTest extends TestCase
         $now   = time();
         $value = uniqid();
 
-        $spy = self::exactly(7);
-        $this->session->expects($spy)->method(self::anything());
-
-        $this->fixture->set('user', $value);
-
-        $actual = [];
-        foreach ($spy->getInvocations() as $invocation) {
-            $actual[] = [$invocation->getMethodName(), $invocation->getParameters()];
-        }
-
-        $expected = [
+        $expectedData = [
+            ['isStarted', []],
             ['set', [$this->name.'/destroy', $now + 30]],
             ['regenerate', [false]],
             ['remove', [$this->name.'/destroy']],
@@ -131,7 +138,49 @@ class SessionContextTest extends TestCase
             ['set', [$this->name.'/expires', $now + 86400]],
             ['set', [$this->name.'/user', $value]],
         ];
-        self::assertEquals($expected, $actual);
+
+        $spy = self::any();
+        $this->session->method('isStarted')->willReturn(true);
+        $this->session->expects($spy)->method(self::anything());
+
+        $this->fixture->set('user', $value);
+
+        $invocations = $spy->getInvocations();
+        self::assertCount(count($expectedData), $invocations);
+
+        foreach ($invocations as $invocation) {
+            $method = $invocation->getMethodName();
+            $params = $invocation->getParameters();
+
+            $expected = array_shift($expectedData);
+            if (empty($expected)) {
+                self::fail('No expected data');
+            }
+
+            self::assertEquals($expected[0], $method);
+            if ($method === 'set') {
+                self::assertEquals(array_shift($expected[1]), $params[0]);
+                self::assertEquals(array_shift($expected[1]), $params[1], '', 1.0);
+            } else {
+                self::assertEquals($expected[1], $params);
+            }
+        }
+    }
+
+    public function testGetCallsIsStarted(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(true);
+        $this->session->expects(self::never())->method('start');
+
+        $this->fixture->get(uniqid(), uniqid());
+    }
+
+    public function testGetStartsSession(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(false);
+        $this->session->expects(self::once())->method('start');
+
+        $this->fixture->get(uniqid(), uniqid());
     }
 
     public function testGet(): void
@@ -155,7 +204,7 @@ class SessionContextTest extends TestCase
      * @param string $default
      * @param string[] $data
      * @param array[] $map
-     * @param array[] $expected
+     * @param array[] $expectedData
      *
      * @dataProvider sampleGetUserExpired
      */
@@ -164,24 +213,36 @@ class SessionContextTest extends TestCase
         string $default,
         array $data,
         array $map,
-        array $expected
+        array $expectedData
     ): void {
         $this->fixture = new SessionContext($this->session, $name, [], ['timeout' => -1]);
 
         $this->session->method('all')->willReturn($data);
         $this->session->method('get')->willReturnMap($map);
+        $this->session->method('isStarted')->willReturn(true);
 
-        $spy = self::exactly(count($expected));
+        $spy = self::any();
         $this->session->expects($spy)->method(self::anything());
 
         $this->fixture->get('user', $default);
 
-        $actual = [];
-        foreach ($spy->getInvocations() as $invocation) {
-            $actual[] = [$invocation->getMethodName(), $invocation->getParameters()];
-        }
+        $invocations = $spy->getInvocations();
+        self::assertCount(count($expectedData), $invocations);
 
-        self::assertEquals($expected, $actual);
+        foreach ($invocations as $invocation) {
+            $method = $invocation->getMethodName();
+            $params = $invocation->getParameters();
+
+            $expected = array_shift($expectedData);
+
+            self::assertEquals($expected[0], $method);
+            if ($method === 'set') {
+                self::assertEquals($expected[1][0], $params[0]);
+                self::assertEquals($expected[1][1], $params[1], '', 1.0);
+            } else {
+                self::assertEquals($expected[1], $params);
+            }
+        }
     }
 
     public function sampleGetUserExpired(): array
@@ -199,6 +260,7 @@ class SessionContextTest extends TestCase
             uniqid().'/'.uniqid() => uniqid(),
         ];
         $clear   = [
+            ['isStarted', []],
             ['get', [$name.'/expires', 0]],
             ['get', [$name.'/destroy', INF]],
             ['get', [$name.'/active', 0]],
@@ -209,6 +271,24 @@ class SessionContextTest extends TestCase
         ];
 
         return [
+            'not expired, destroyed, or inactive' => [
+                'name' => $name,
+                'default' => $default,
+                'data' => $data,
+                'map' => [
+                    [$name.'/expires', 0, INF],
+                    [$name.'/destroy', INF, INF],
+                    [$name.'/active', 0, INF],
+                ],
+                'expected' => [
+                    ['isStarted', []],
+                    ['get', [$name.'/expires', 0]],
+                    ['get', [$name.'/destroy', INF]],
+                    ['get', [$name.'/active', 0]],
+                    ['set', [$name.'/active', $now]],
+                    ['get', [$name.'/user', $default]],
+                ],
+            ],
             'is expired' => [
                 'name' => $name,
                 'default' => $default,
@@ -242,23 +322,6 @@ class SessionContextTest extends TestCase
                 ],
                 'expected' => $clear,
             ],
-            'not expired, destroyed, or inactive' => [
-                'name' => $name,
-                'default' => $default,
-                'data' => $data,
-                'map' => [
-                    [$name.'/expires', 0, INF],
-                    [$name.'/destroy', INF, INF],
-                    [$name.'/active', 0, INF],
-                ],
-                'expected' => [
-                    ['get', [$name.'/expires', 0]],
-                    ['get', [$name.'/destroy', INF]],
-                    ['get', [$name.'/active', 0]],
-                    ['set', [$name.'/active', $now]],
-                    ['get', [$name.'/user', $default]],
-                ],
-            ],
         ];
     }
 
@@ -278,6 +341,22 @@ class SessionContextTest extends TestCase
         self::assertEquals($value, $actual);
     }
 
+    public function testRemoveCallsIsStarted(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(true);
+        $this->session->expects(self::never())->method('start');
+
+        $this->fixture->remove(uniqid());
+    }
+
+    public function testRemoveStartsSession(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(false);
+        $this->session->expects(self::once())->method('start');
+
+        $this->fixture->remove(uniqid());
+    }
+
     public function testRemove(): void
     {
         $name = uniqid();
@@ -287,6 +366,22 @@ class SessionContextTest extends TestCase
             ->with($this->name.'/'.$name);
 
         $this->fixture->remove($name);
+    }
+
+    public function testClearCallsIsStarted(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(true);
+        $this->session->expects(self::never())->method('start');
+
+        $this->fixture->clear();
+    }
+
+    public function testClearStartsSession(): void
+    {
+        $this->session->expects(self::once())->method('isStarted')->willReturn(false);
+        $this->session->expects(self::once())->method('start');
+
+        $this->fixture->clear();
     }
 
     public function testClear(): void

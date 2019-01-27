@@ -59,17 +59,21 @@ class SessionContext implements ContextInterface
      */
     public function set(string $name, $value): void
     {
-        if ('user' === $name) {
-            $now = time();
-            $this->set('destroy', $now + $this->config['destroy.delay']);
-            $this->session->regenerate();
-            $this->remove('destroy');
-            $this->set('login', $now);
-            $this->set('active', $now);
-            $this->set('expires', $now + $this->config['ttl']);
+        if (!$this->session->isStarted()) {
+            $this->session->start();
         }
 
-        $this->session->set($this->name.'/'.$name, $value);
+        if ('user' === $name) {
+            $now = time();
+            $this->doSet('destroy', $now + $this->config['destroy.delay']);
+            $this->session->regenerate();
+            $this->doRemove('destroy');
+            $this->doSet('login', $now);
+            $this->doSet('active', $now);
+            $this->doSet('expires', $now + $this->config['ttl']);
+        }
+
+        $this->doSet($name, $value);
     }
 
     /**
@@ -77,24 +81,28 @@ class SessionContext implements ContextInterface
      */
     public function get(string $name, $default = null)
     {
+        if (!$this->session->isStarted()) {
+            $this->session->start();
+        }
+
         if ('user' === $name) {
             $now     = time();
-            $expires = $this->get('expires', 0);
-            $destroy = $this->get('destroy', INF);
-            $active  = $this->get('active', 0) + ($this->config['timeout'] ?: INF);
+            $expires = $this->doGet('expires', 0);
+            $destroy = $this->doGet('destroy', INF);
+            $active  = $this->doGet('active', 0) + ($this->config['timeout'] ?: INF);
             $clear   = min($expires, $destroy, $active);
 
             if ($now > $clear) {
                 // This session should be destroyed.
                 // Clear out all data to prevent unauthorized use.
-                $this->clear();
+                $this->doClear();
             } else {
                 // Update last active time.
-                $this->set('active', $now);
+                $this->doSet('active', $now);
             }
         }
 
-        return $this->session->get($this->name.'/'.$name, $default);
+        return $this->doGet($name, $default);
     }
 
     /**
@@ -102,7 +110,11 @@ class SessionContext implements ContextInterface
      */
     public function remove(string $name): void
     {
-        $this->session->remove($this->name.'/'.$name);
+        if (!$this->session->isStarted()) {
+            $this->session->start();
+        }
+
+        $this->doRemove($name);
     }
 
     /**
@@ -110,11 +122,11 @@ class SessionContext implements ContextInterface
      */
     public function clear(): void
     {
-        foreach ($this->session->all() as $key => $value) {
-            if (substr($key, 0, strlen($this->name.'/')) === $this->name.'/') {
-                $this->session->remove($key);
-            }
+        if (!$this->session->isStarted()) {
+            $this->session->start();
         }
+
+        $this->doClear();
     }
 
     /**
@@ -170,5 +182,45 @@ class SessionContext implements ContextInterface
             // Allows for a network lag in asynchronous applications.
             'destroy.delay' => 30,
         ];
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    private function doSet(string $key, $value): void
+    {
+        $this->session->set($this->name.'/'.$key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    private function doGet(string $key, $default = null)
+    {
+        return $this->session->get($this->name.'/'.$key, $default);
+    }
+
+    /**
+     * @param string $key
+     */
+    private function doRemove(string $key): void
+    {
+        $this->session->remove($this->name.'/'.$key);
+    }
+
+    /**
+     * Clears out data for this context only.
+     */
+    private function doClear(): void
+    {
+        foreach ($this->session->all() as $key => $value) {
+            if (substr($key, 0, strlen($this->name.'/')) === $this->name.'/') {
+                $this->session->remove($key);
+            }
+        }
     }
 }
