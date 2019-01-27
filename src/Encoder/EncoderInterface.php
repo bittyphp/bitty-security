@@ -9,7 +9,7 @@ interface EncoderInterface
     /**
      * @var int
      */
-    const MAX_PASSWORD_LEN = 1000;
+    public const MAX_PASSWORD_LEN = 1000;
 
     /**
      * Encodes a password.
