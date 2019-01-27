@@ -17,7 +17,7 @@ class EncoderCollection implements EncoderCollectionInterface
     /**
      * @param EncoderInterface[]|EncoderInterface $encoders
      */
-    public function __construct($encoders)
+    public function __construct($encoders = [])
     {
         if (is_array($encoders)) {
             foreach ($encoders as $class => $encoder) {
