@@ -44,11 +44,43 @@ class EncoderCollectionTest extends TestCase
         $user     = $this->createUser();
         $encoderA = $this->createEncoder();
         $encoderB = $this->createEncoder();
-        $classA   = \stdClass::class;
-        $classB   = UserInterface::class;
 
-        $this->fixture->addEncoder($encoderA, $classA);
-        $this->fixture->addEncoder($encoderB, $classB);
+        $this->fixture->addEncoder($encoderA, \stdClass::class);
+        $this->fixture->addEncoder($encoderB, UserInterface::class);
+
+        $actual = $this->fixture->getEncoder($user);
+
+        self::assertNotSame($encoderA, $actual);
+        self::assertSame($encoderB, $actual);
+    }
+
+    public function testGetEncoderUsingConstructorSingle(): void
+    {
+        $user     = $this->createUser();
+        $encoderA = $this->createEncoder();
+        $encoderB = $this->createEncoder();
+
+        $this->fixture = new EncoderCollection($encoderA);
+        $this->fixture->addEncoder($encoderB, \stdClass::class);
+
+        $actual = $this->fixture->getEncoder($user);
+
+        self::assertSame($encoderA, $actual);
+        self::assertNotSame($encoderB, $actual);
+    }
+
+    public function testGetEncoderUsingConstructorArray(): void
+    {
+        $user     = $this->createUser();
+        $encoderA = $this->createEncoder();
+        $encoderB = $this->createEncoder();
+
+        $this->fixture = new EncoderCollection(
+            [
+                \stdClass::class => $encoderA,
+                UserInterface::class => $encoderB,
+            ]
+        );
 
         $actual = $this->fixture->getEncoder($user);
 
