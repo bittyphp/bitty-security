@@ -5,12 +5,13 @@ namespace Bitty\Tests\Security\Encoder;
 use Bitty\Security\Encoder\AbstractEncoder;
 use Bitty\Security\Encoder\EncoderInterface;
 use Bitty\Security\Exception\AuthenticationException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AbstractEncoderTest extends TestCase
 {
     /**
-     * @var AbstractEncoder
+     * @var AbstractEncoder|MockObject
      */
     protected $fixture = null;
 

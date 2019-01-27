@@ -57,7 +57,7 @@ class InMemoryUserProviderTest extends TestCase
 
     /**
      * @param array $users
-     * @param string $user
+     * @param string $username
      * @param array $expected
      *
      * @dataProvider sampleUsers
