@@ -3,17 +3,17 @@
 namespace Bitty\Tests\Security\Context;
 
 use Bitty\Http\Session\SessionInterface;
-use Bitty\Security\Context\Context;
 use Bitty\Security\Context\ContextInterface;
+use Bitty\Security\Context\SessionContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-class ContextTest extends TestCase
+class SessionContextTest extends TestCase
 {
     /**
-     * @var Context
+     * @var SessionContext
      */
     protected $fixture = null;
 
@@ -34,7 +34,7 @@ class ContextTest extends TestCase
         $this->name    = uniqid();
         $this->session = $this->createMock(SessionInterface::class);
 
-        $this->fixture = new Context($this->session, $this->name, []);
+        $this->fixture = new SessionContext($this->session, $this->name, []);
     }
 
     public function testInstanceOf(): void
@@ -50,7 +50,7 @@ class ContextTest extends TestCase
      */
     public function testIsDefault(array $options, bool $expected): void
     {
-        $this->fixture = new Context($this->session, uniqid(), [], $options);
+        $this->fixture = new SessionContext($this->session, uniqid(), [], $options);
 
         $actual = $this->fixture->isDefault();
 
@@ -166,7 +166,7 @@ class ContextTest extends TestCase
         array $map,
         array $expected
     ): void {
-        $this->fixture = new Context($this->session, $name, [], ['timeout' => -1]);
+        $this->fixture = new SessionContext($this->session, $name, [], ['timeout' => -1]);
 
         $this->session->method('all')->willReturn($data);
         $this->session->method('get')->willReturnMap($map);
@@ -326,7 +326,7 @@ class ContextTest extends TestCase
     {
         $request = $this->createRequest($path);
 
-        $this->fixture = new Context($this->session, uniqid(), $paths);
+        $this->fixture = new SessionContext($this->session, uniqid(), $paths);
 
         $actual = $this->fixture->isShielded($request);
 
@@ -381,7 +381,7 @@ class ContextTest extends TestCase
     {
         $request = $this->createRequest($path);
 
-        $this->fixture = new Context($this->session, $name, $paths);
+        $this->fixture = new SessionContext($this->session, $name, $paths);
 
         $actual = $this->fixture->getPatternMatch($request);
 

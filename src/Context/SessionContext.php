@@ -6,7 +6,7 @@ use Bitty\Http\Session\SessionInterface;
 use Bitty\Security\Context\ContextInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Context implements ContextInterface
+class SessionContext implements ContextInterface
 {
     /**
      * @var SessionInterface
