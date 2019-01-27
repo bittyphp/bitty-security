@@ -14,6 +14,21 @@ class InMemoryUserProvider extends AbstractUserProvider
     protected $users = [];
 
     /**
+     * Users array should be structured like:
+     *
+     * [
+     *     'bob' => [
+     *         'password' => 'some_encoded_password',
+     *         'salt' => string|null,
+     *         'roles' => string[],
+     *     ],
+     *     'frank' => [
+     *         'password' => 'some_encoded_password',
+     *         'salt' => string|null,
+     *         'roles' => string[],
+     *     ],
+     * ]
+     *
      * @param array $users Array of string[]
      */
     public function __construct(array $users)
