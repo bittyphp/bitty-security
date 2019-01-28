@@ -10,16 +10,21 @@ use Psr\Http\Message\ServerRequestInterface;
 class ContextMap implements ContextMapInterface
 {
     /**
-     * @var ContextInterface[]
+     * @var \SplObjectStorage Collection of ContextInterface
      */
-    protected $contexts = [];
+    protected $contexts = null;
+
+    public function __construct()
+    {
+        $this->contexts = new \SplObjectStorage();
+    }
 
     /**
      * {@inheritDoc}
      */
     public function add(ContextInterface $context): void
     {
-        $this->contexts[] = $context;
+        $this->contexts->attach($context);
     }
 
     /**
@@ -28,6 +33,7 @@ class ContextMap implements ContextMapInterface
     public function getUser(ServerRequestInterface $request): ?UserInterface
     {
         // Find user based on request.
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             if ($context->isShielded($request)) {
                 return $context->get('user');
@@ -36,6 +42,7 @@ class ContextMap implements ContextMapInterface
 
         // Request is not secured.
         // Find user from default context.
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             if ($context->isDefault()) {
                 return $context->get('user');
@@ -44,7 +51,10 @@ class ContextMap implements ContextMapInterface
 
         // No default context set.
         // Find user from first available context.
-        $default = reset($this->contexts);
+        $this->contexts->rewind();
+
+        /** @var ContextInterface|null $default */
+        $default = $this->contexts->current();
         if ($default) {
             return $default->get('user');
         }
