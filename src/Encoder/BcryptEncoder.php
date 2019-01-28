@@ -28,7 +28,7 @@ class BcryptEncoder extends AbstractEncoder
         $this->checkPassword($password);
 
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->cost]);
-        if (false === $hash) {
+        if (!$hash) {
             throw new AuthenticationException('Failed to encode password.');
         }
 

@@ -2,11 +2,12 @@
 
 namespace Bitty\Security\Encoder;
 
+use Bitty\Security\Encoder\EncoderCollectionInterface;
 use Bitty\Security\Encoder\EncoderInterface;
 use Bitty\Security\Exception\SecurityException;
 use Bitty\Security\User\UserInterface;
 
-class EncoderCollection
+class EncoderCollection implements EncoderCollectionInterface
 {
     /**
      * @var EncoderInterface[]
@@ -16,7 +17,7 @@ class EncoderCollection
     /**
      * @param EncoderInterface[]|EncoderInterface $encoders
      */
-    public function __construct($encoders)
+    public function __construct($encoders = [])
     {
         if (is_array($encoders)) {
             foreach ($encoders as $class => $encoder) {
@@ -47,13 +48,7 @@ class EncoderCollection
     }
 
     /**
-     * Gets the password encoder for the given user.
-     *
-     * @param UserInterface $user
-     *
-     * @return EncoderInterface
-     *
-     * @throws SecurityException
+     * {@inheritDoc}
      */
     public function getEncoder(UserInterface $user): EncoderInterface
     {
