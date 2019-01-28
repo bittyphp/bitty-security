@@ -62,6 +62,18 @@ class ContextCollectionTest extends TestCase
         self::assertFalse($actual);
     }
 
+    public function testCantAddSameContextTwice(): void
+    {
+        $context = $this->createContext();
+
+        $this->fixture->add($context);
+        $this->fixture->add($context);
+
+        $context->expects(self::once())->method('isDefault');
+
+        $this->fixture->isDefault();
+    }
+
     public function testIsDefaultNoContexts(): void
     {
         $actual = $this->fixture->isDefault();

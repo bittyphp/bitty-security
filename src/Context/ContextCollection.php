@@ -8,14 +8,19 @@ use Psr\Http\Message\ServerRequestInterface;
 class ContextCollection implements ContextInterface
 {
     /**
-     * @var ContextInterface[]
+     * @var \SplObjectStorage Collection of ContextInterface
      */
-    protected $contexts = [];
+    protected $contexts = null;
 
     /**
      * @var ContextInterface|null
      */
     protected $activeContext = null;
+
+    public function __construct()
+    {
+        $this->contexts = new \SplObjectStorage();
+    }
 
     /**
      * Adds a context to the collection.
@@ -24,7 +29,7 @@ class ContextCollection implements ContextInterface
      */
     public function add(ContextInterface $context): void
     {
-        $this->contexts[] = $context;
+        $this->contexts->attach($context);
     }
 
     /**
@@ -42,6 +47,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             if ($context->isDefault()) {
                 $this->activeContext = $context;
@@ -60,6 +66,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $context->set($name, $value);
         }
@@ -74,6 +81,7 @@ class ContextCollection implements ContextInterface
             return $this->activeContext->get($name, $default);
         }
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $value = $context->get($name);
             if (null !== $value) {
@@ -91,6 +99,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $context->remove($name);
         }
@@ -103,6 +112,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $context->clear();
         }
@@ -115,6 +125,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             if ($context->isShielded($request)) {
                 $this->activeContext = $context;
@@ -133,6 +144,7 @@ class ContextCollection implements ContextInterface
     {
         $this->activeContext = null;
 
+        /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $match = $context->getPatternMatch($request);
             if (!empty($match)) {

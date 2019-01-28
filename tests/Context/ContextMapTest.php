@@ -56,6 +56,19 @@ class ContextMapTest extends TestCase
         $this->fixture->getUser($request);
     }
 
+    public function testCantAddSameContextTwice(): void
+    {
+        $request = $this->createRequest();
+        $context = $this->createContext();
+
+        $this->fixture->add($context);
+        $this->fixture->add($context);
+
+        $context->expects(self::once())->method('isShielded');
+
+        $this->fixture->getUser($request);
+    }
+
     public function testShieldedContextGetsUser(): void
     {
         $user     = $this->createUser();

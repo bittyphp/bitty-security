@@ -13,7 +13,7 @@ class Authorizer implements AuthorizerInterface
      */
     public function authorize(UserInterface $user, array $roles): bool
     {
-        // throw new AuthorizationException('not done');
+        // This is not done
         return true;
     }
 }
