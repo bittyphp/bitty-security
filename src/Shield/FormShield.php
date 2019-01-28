@@ -3,7 +3,6 @@
 namespace Bitty\Security\Shield;
 
 use Bitty\Http\RedirectResponse;
-use Bitty\Http\Response;
 use Bitty\Security\Shield\AbstractShield;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
