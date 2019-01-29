@@ -140,17 +140,17 @@ class ContextCollection implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function getPatternMatch(ServerRequestInterface $request): array
+    public function getRoles(ServerRequestInterface $request): array
     {
         $this->activeContext = null;
 
         /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
-            $match = $context->getPatternMatch($request);
-            if (!empty($match)) {
+            $roles = $context->getRoles($request);
+            if (!empty($roles)) {
                 $this->activeContext = $context;
 
-                return $match;
+                return $roles;
             }
         }
 

@@ -29,8 +29,8 @@ class FormShield extends AbstractShield
             return new RedirectResponse($this->config['logout.target']);
         }
 
-        $match = $this->context->getPatternMatch($request);
-        if (empty($match) || empty($match['roles'])) {
+        $roles = $this->context->getRoles($request);
+        if (empty($roles)) {
             return null;
         }
 
@@ -45,7 +45,7 @@ class FormShield extends AbstractShield
             return new RedirectResponse($this->config['login.path']);
         }
 
-        $this->authorize($user, $match['roles']);
+        $this->authorize($user, $roles);
 
         return null;
     }

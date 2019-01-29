@@ -134,24 +134,20 @@ class SessionContext implements ContextInterface
      */
     public function isShielded(ServerRequestInterface $request): bool
     {
-        $match = $this->getPatternMatch($request);
+        $roles = $this->getRoles($request);
 
-        return !empty($match) && !empty($match['roles']);
+        return !empty($roles);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPatternMatch(ServerRequestInterface $request): array
+    public function getRoles(ServerRequestInterface $request): array
     {
         $path = $request->getUri()->getPath();
         foreach ($this->paths as $pattern => $roles) {
             if (preg_match("`$pattern`", $path)) {
-                return [
-                    'shield' => $this->name,
-                    'pattern' => $pattern,
-                    'roles' => $roles,
-                ];
+                return $roles;
             }
         }
 

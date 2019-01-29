@@ -358,28 +358,28 @@ class ContextCollectionTest extends TestCase
         $this->fixture->get($name, uniqid());
     }
 
-    public function testGetPatternMatch(): void
+    public function testGetRoles(): void
     {
-        $match    = [uniqid()];
+        $roles    = [uniqid()];
         $request  = $this->createRequest();
         $contextA = $this->createContext();
-        $contextB = $this->createContext(false, false, $match);
+        $contextB = $this->createContext(false, false, $roles);
         $contextC = $this->createContext();
 
         $this->fixture->add($contextA);
         $this->fixture->add($contextB);
         $this->fixture->add($contextC);
 
-        $contextA->expects(self::once())->method('getPatternMatch')->with($request);
-        $contextB->expects(self::once())->method('getPatternMatch')->with($request);
-        $contextC->expects(self::never())->method('getPatternMatch');
+        $contextA->expects(self::once())->method('getRoles')->with($request);
+        $contextB->expects(self::once())->method('getRoles')->with($request);
+        $contextC->expects(self::never())->method('getRoles');
 
-        $actual = $this->fixture->getPatternMatch($request);
+        $actual = $this->fixture->getRoles($request);
 
-        self::assertEquals($match, $actual);
+        self::assertEquals($roles, $actual);
     }
 
-    public function testGetPatternMatchNoMatches(): void
+    public function testGetRolesNoMatches(): void
     {
         $request  = $this->createRequest();
         $contextA = $this->createContext();
@@ -388,15 +388,15 @@ class ContextCollectionTest extends TestCase
         $this->fixture->add($contextA);
         $this->fixture->add($contextB);
 
-        $contextA->expects(self::once())->method('getPatternMatch')->with($request);
-        $contextB->expects(self::once())->method('getPatternMatch')->with($request);
+        $contextA->expects(self::once())->method('getRoles')->with($request);
+        $contextB->expects(self::once())->method('getRoles')->with($request);
 
-        $actual = $this->fixture->getPatternMatch($request);
+        $actual = $this->fixture->getRoles($request);
 
         self::assertEquals([], $actual);
     }
 
-    public function testGetPatternMatchSetsActiveContext(): void
+    public function testGetRolesSetsActiveContext(): void
     {
         $name     = uniqid();
         $default  = uniqid();
@@ -410,11 +410,11 @@ class ContextCollectionTest extends TestCase
         $contextA->expects(self::never())->method('get');
         $contextB->expects(self::once())->method('get')->with($name, $default);
 
-        $this->fixture->getPatternMatch($request);
+        $this->fixture->getRoles($request);
         $this->fixture->get($name, $default);
     }
 
-    public function testGetPatternMatchClearsActiveContext(): void
+    public function testGetRolesClearsActiveContext(): void
     {
         $name     = uniqid();
         $request  = $this->createRequest();
@@ -428,28 +428,28 @@ class ContextCollectionTest extends TestCase
         $contextB->expects(self::once())->method('get')->with($name, null);
 
         $this->fixture->isDefault();
-        $this->fixture->getPatternMatch($request);
+        $this->fixture->getRoles($request);
         $this->fixture->get($name, uniqid());
     }
 
     /**
      * @param bool $isDefault
      * @param bool $isShielded
-     * @param array $match
+     * @param string[] $roles
      *
      * @return ContextInterface|MockObject
      */
     protected function createContext(
         bool $isDefault = false,
         bool $isShielded = false,
-        array $match = []
+        array $roles = []
     ): ContextInterface {
         return $this->createConfiguredMock(
             ContextInterface::class,
             [
                 'isDefault' => $isDefault,
                 'isShielded' => $isShielded,
-                'getPatternMatch' => $match,
+                'getRoles' => $roles,
             ]
         );
     }
