@@ -470,20 +470,20 @@ class SessionContextTest extends TestCase
      * @param string $path
      * @param mixed[] $expected
      *
-     * @dataProvider sampleGetPatternMatch
+     * @dataProvider sampleGetRoles
      */
-    public function testGetPatternMatch(array $paths, string $name, string $path, array $expected): void
+    public function testGetRoles(array $paths, string $name, string $path, array $expected): void
     {
         $request = $this->createRequest($path);
 
         $this->fixture = new SessionContext($this->session, $name, $paths);
 
-        $actual = $this->fixture->getPatternMatch($request);
+        $actual = $this->fixture->getRoles($request);
 
         self::assertEquals($expected, $actual);
     }
 
-    public function sampleGetPatternMatch(): array
+    public function sampleGetRoles(): array
     {
         $name  = uniqid();
         $roles = [uniqid(), uniqid()];
@@ -512,11 +512,7 @@ class SessionContextTest extends TestCase
                 ],
                 'name' => $name,
                 'path' => uniqid('/'),
-                'expected' => [
-                    'shield' => $name,
-                    'pattern' => '^/',
-                    'roles' => $roles,
-                ],
+                'expected' => $roles,
             ],
             'overlapping paths' => [
                 'paths' => [
@@ -527,11 +523,7 @@ class SessionContextTest extends TestCase
                 ],
                 'name' => $name,
                 'path' => uniqid('/foo'),
-                'expected' => [
-                    'shield' => $name,
-                    'pattern' => '^/foo',
-                    'roles' => $roles,
-                ],
+                'expected' => $roles,
             ],
         ];
     }

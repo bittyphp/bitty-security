@@ -15,14 +15,14 @@ class HttpBasicShield extends AbstractShield
      */
     public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
-        $match = $this->context->getPatternMatch($request);
-        if (empty($match) || empty($match['roles'])) {
+        $roles = $this->context->getRoles($request);
+        if (empty($roles)) {
             return null;
         }
 
         $user = $this->getUser($request);
         if ($user) {
-            $this->authorize($user, $match['roles']);
+            $this->authorize($user, $roles);
 
             return null;
         }

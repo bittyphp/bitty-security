@@ -53,13 +53,11 @@ interface ContextInterface
     public function isShielded(ServerRequestInterface $request): bool;
 
     /**
-     * Gets the first pattern and roles that match the request.
-     *
-     * TODO: This needs a better name and to return an object.
+     * Gets the list of roles required for the request.
      *
      * @param ServerRequestInterface $request
      *
-     * @return mixed[]
+     * @return string[]
      */
-    public function getPatternMatch(ServerRequestInterface $request): array;
+    public function getRoles(ServerRequestInterface $request): array;
 }
