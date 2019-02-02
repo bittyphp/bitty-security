@@ -160,7 +160,7 @@ class SessionContextTest extends TestCase
             self::assertEquals($expected[0], $method);
             if ($method === 'set') {
                 self::assertEquals(array_shift($expected[1]), $params[0]);
-                self::assertEquals(array_shift($expected[1]), $params[1], '', 1.0);
+                self::assertEquals(array_shift($expected[1]), $params[1], '', 2.0);
             } else {
                 self::assertEquals($expected[1], $params);
             }
@@ -238,7 +238,7 @@ class SessionContextTest extends TestCase
             self::assertEquals($expected[0], $method);
             if ($method === 'set') {
                 self::assertEquals($expected[1][0], $params[0]);
-                self::assertEquals($expected[1][1], $params[1], '', 1.0);
+                self::assertEquals($expected[1][1], $params[1], '', 2.0);
             } else {
                 self::assertEquals($expected[1], $params);
             }
