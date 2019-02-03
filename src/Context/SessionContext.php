@@ -159,7 +159,7 @@ class SessionContext implements ContextInterface
      *
      * @return mixed[]
      */
-    private function getDefaultConfig(): array
+    public function getDefaultConfig(): array
     {
         return [
             // Whether or not this is the default context.

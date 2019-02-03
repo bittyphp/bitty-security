@@ -76,7 +76,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @return mixed[]
      */
-    protected function getDefaultConfig(): array
+    public function getDefaultConfig(): array
     {
         return [];
     }

@@ -53,7 +53,7 @@ class FormShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultConfig(): array
+    public function getDefaultConfig(): array
     {
         return [
             // Path to the login page.

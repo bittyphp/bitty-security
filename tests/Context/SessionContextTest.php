@@ -42,6 +42,19 @@ class SessionContextTest extends TestCase
         self::assertInstanceOf(ContextInterface::class, $this->fixture);
     }
 
+    public function testGetDefaultConfig(): void
+    {
+        $actual = $this->fixture->getDefaultConfig();
+
+        $expected = [
+            'default' => true,
+            'ttl' => 86400,
+            'timeout' => 0,
+            'destroy.delay' => 30,
+        ];
+        self::assertEquals($expected, $actual);
+    }
+
     /**
      * @param mixed[] $options
      * @param bool $expected

@@ -40,7 +40,7 @@ class HttpBasicShield extends AbstractShield
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultConfig(): array
+    public function getDefaultConfig(): array
     {
         return [
             'realm' => 'Secured Area',
