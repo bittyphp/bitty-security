@@ -27,7 +27,7 @@ class InMemoryUserProviderTest extends TestCase
         self::assertInstanceOf(AbstractUserProvider::class, $this->fixture);
     }
 
-    public function testGetUserBlocksLongPasswords(): void
+    public function testGetUserBlocksLongUsername(): void
     {
         $username = str_repeat('*', AbstractUserProvider::MAX_USERNAME_LEN + 1);
 
@@ -82,7 +82,7 @@ class InMemoryUserProviderTest extends TestCase
 
     public function sampleUsers(): array
     {
-        $username = uniqid();
+        $username = str_repeat('*', AbstractUserProvider::MAX_USERNAME_LEN);
         $password = uniqid();
         $salt     = uniqid();
         $roleA    = uniqid();
@@ -204,6 +204,24 @@ class InMemoryUserProviderTest extends TestCase
                     'password' => $password,
                     'salt' => $salt,
                     'roles' => [],
+                ],
+            ],
+            'string role' => [
+                'users' => [
+                    uniqid() => $userA,
+                    $username => [
+                        'password' => $password,
+                        'salt' => $salt,
+                        'roles' => $roleA,
+                    ],
+                    uniqid() => $userB,
+                ],
+                'user' => $username,
+                'expected' => [
+                    'username' => $username,
+                    'password' => $password,
+                    'salt' => $salt,
+                    'roles' => [$roleA],
                 ],
             ],
             'with salt and roles' => [
