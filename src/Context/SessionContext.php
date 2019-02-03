@@ -11,22 +11,22 @@ class SessionContext implements ContextInterface
     /**
      * @var SessionInterface
      */
-    protected $session = null;
+    private $session = null;
 
     /**
      * @var string
      */
-    protected $name = null;
+    private $name = null;
 
     /**
      * @var array[]
      */
-    protected $paths = null;
+    private $paths = null;
 
     /**
      * @var mixed[]
      */
-    protected $config = null;
+    private $config = null;
 
     /**
      * @param SessionInterface $session
@@ -159,7 +159,7 @@ class SessionContext implements ContextInterface
      *
      * @return mixed[]
      */
-    protected function getDefaultConfig(): array
+    private function getDefaultConfig(): array
     {
         return [
             // Whether or not this is the default context.

@@ -10,12 +10,12 @@ class ContextCollection implements ContextInterface
     /**
      * @var \SplObjectStorage Collection of ContextInterface
      */
-    protected $contexts = null;
+    private $contexts = null;
 
     /**
      * @var ContextInterface|null
      */
-    protected $activeContext = null;
+    private $activeContext = null;
 
     public function __construct()
     {

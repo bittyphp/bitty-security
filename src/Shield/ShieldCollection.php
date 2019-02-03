@@ -15,17 +15,17 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
     /**
      * @var ContainerInterface|null
      */
-    protected $container = null;
+    private $container = null;
 
     /**
      * @var ShieldInterface[]
      */
-    protected $shields = null;
+    private $shields = null;
 
     /**
      * @var ContextCollection
      */
-    protected $context = null;
+    private $context = null;
 
     /**
      * @param ShieldInterface[] $shields

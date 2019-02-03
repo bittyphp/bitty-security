@@ -10,7 +10,7 @@ class BcryptEncoder extends AbstractEncoder
     /**
      * @var int
      */
-    protected $cost = null;
+    private $cost = null;
 
     /**
      * @param int $cost

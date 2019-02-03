@@ -13,7 +13,7 @@ class ContextCollectionTest extends TestCase
     /**
      * @var ContextCollection
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {
@@ -439,7 +439,7 @@ class ContextCollectionTest extends TestCase
      *
      * @return ContextInterface|MockObject
      */
-    protected function createContext(
+    private function createContext(
         bool $isDefault = false,
         bool $isShielded = false,
         array $roles = []
@@ -457,7 +457,7 @@ class ContextCollectionTest extends TestCase
     /**
      * @return ServerRequestInterface
      */
-    protected function createRequest(): ServerRequestInterface
+    private function createRequest(): ServerRequestInterface
     {
         return $this->createMock(ServerRequestInterface::class);
     }

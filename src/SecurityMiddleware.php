@@ -18,12 +18,12 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     /**
      * @var PsrContainerInterface|null
      */
-    protected $container = null;
+    private $container = null;
 
     /**
      * @var ShieldInterface
      */
-    protected $shield = null;
+    private $shield = null;
 
     /**
      * @param ShieldInterface $shield

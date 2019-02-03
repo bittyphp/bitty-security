@@ -14,7 +14,7 @@ class ContextMapServiceProviderTest extends TestCase
     /**
      * @var ContextMapServiceProvider
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {

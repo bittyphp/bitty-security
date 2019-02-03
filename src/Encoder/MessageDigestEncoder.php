@@ -9,7 +9,7 @@ class MessageDigestEncoder extends AbstractEncoder
     /**
      * @var string
      */
-    protected $algorithm = null;
+    private $algorithm = null;
 
     /**
      * @param string $algorithm

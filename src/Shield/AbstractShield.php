@@ -23,22 +23,22 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
     /**
      * @var ContextInterface
      */
-    protected $context = null;
+    private $context = null;
 
     /**
      * @var AuthenticatorInterface
      */
-    protected $authenticator = null;
+    private $authenticator = null;
 
     /**
      * @var AuthorizerInterface
      */
-    protected $authorizer = null;
+    private $authorizer = null;
 
     /**
      * @var mixed[]
      */
-    protected $config = null;
+    private $config = null;
 
     /**
      * @param ContextInterface $context
@@ -79,29 +79,6 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
     protected function getDefaultConfig(): array
     {
         return [];
-    }
-
-    /**
-     * Triggers security events to enable external actions, e.g. logging.
-     *
-     * @param string|EventInterface $event
-     * @param null|object|string $target
-     * @param mixed[] $params
-     *
-     * @return mixed
-     */
-    protected function triggerEvent($event, $target = null, array $params = [])
-    {
-        if (!$this->container || !$this->container->has('event.manager')) {
-            return;
-        }
-
-        $eventManager = $this->container->get('event.manager');
-        if (!$eventManager instanceof EventManagerInterface) {
-            return;
-        }
-
-        return $eventManager->trigger($event, $target, $params);
     }
 
     /**
@@ -164,5 +141,28 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
         }
 
         $this->triggerEvent('security.authorization.success', $user);
+    }
+
+    /**
+     * Triggers security events to enable external actions, e.g. logging.
+     *
+     * @param string|EventInterface $event
+     * @param null|object|string $target
+     * @param mixed[] $params
+     *
+     * @return mixed
+     */
+    private function triggerEvent($event, $target = null, array $params = [])
+    {
+        if (!$this->container || !$this->container->has('event.manager')) {
+            return;
+        }
+
+        $eventManager = $this->container->get('event.manager');
+        if (!$eventManager instanceof EventManagerInterface) {
+            return;
+        }
+
+        return $eventManager->trigger($event, $target, $params);
     }
 }

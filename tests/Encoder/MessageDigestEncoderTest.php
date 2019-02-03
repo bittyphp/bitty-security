@@ -12,7 +12,7 @@ class MessageDigestEncoderTest extends TestCase
     /**
      * @var MessageDigestEncoder
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {

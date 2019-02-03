@@ -14,12 +14,12 @@ class Authenticator implements AuthenticatorInterface
     /**
      * @var UserProviderInterface
      */
-    protected $userProvider = null;
+    private $userProvider = null;
 
     /**
      * @var EncoderCollection
      */
-    protected $encoders = null;
+    private $encoders = null;
 
     /**
      * @param UserProviderInterface $userProvider

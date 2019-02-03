@@ -12,7 +12,7 @@ class ContextMap implements ContextMapInterface
     /**
      * @var \SplObjectStorage Collection of ContextInterface
      */
-    protected $contexts = null;
+    private $contexts = null;
 
     public function __construct()
     {

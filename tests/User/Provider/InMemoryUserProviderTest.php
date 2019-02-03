@@ -13,7 +13,7 @@ class InMemoryUserProviderTest extends TestCase
     /**
      * @var InMemoryUserProvider
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {

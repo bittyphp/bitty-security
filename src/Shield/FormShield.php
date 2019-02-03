@@ -51,45 +51,6 @@ class FormShield extends AbstractShield
     }
 
     /**
-     * Handles form logins.
-     *
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface|null
-     */
-    protected function handleFormLogin(ServerRequestInterface $request): ?ResponseInterface
-    {
-        if ('POST' !== $request->getMethod()) {
-            return null;
-        }
-
-        $params = $request->getParsedBody();
-        if (!is_array($params)) {
-            return null;
-        }
-
-        $usernameField = $this->config['login.username'];
-        $passwordField = $this->config['login.password'];
-
-        $username = empty($params[$usernameField]) ? '' : $params[$usernameField];
-        $password = empty($params[$passwordField]) ? '' : $params[$passwordField];
-
-        if (empty($username) || empty($password)) {
-            return null;
-        }
-
-        $this->authenticate($username, $password);
-
-        $target = $this->config['login.target'];
-        if ($this->config['login.use_referrer']) {
-            $target = $this->context->get('login.target', $target);
-            $this->context->remove('login.target');
-        }
-
-        return new RedirectResponse($target);
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected function getDefaultConfig(): array
@@ -119,5 +80,44 @@ class FormShield extends AbstractShield
             // Path to go to after logging out.
             'logout.target' => '/',
         ];
+    }
+
+    /**
+     * Handles form logins.
+     *
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface|null
+     */
+    private function handleFormLogin(ServerRequestInterface $request): ?ResponseInterface
+    {
+        if ('POST' !== $request->getMethod()) {
+            return null;
+        }
+
+        $params = $request->getParsedBody();
+        if (!is_array($params)) {
+            return null;
+        }
+
+        $usernameField = $this->config['login.username'];
+        $passwordField = $this->config['login.password'];
+
+        $username = empty($params[$usernameField]) ? '' : $params[$usernameField];
+        $password = empty($params[$passwordField]) ? '' : $params[$passwordField];
+
+        if (empty($username) || empty($password)) {
+            return null;
+        }
+
+        $this->authenticate($username, $password);
+
+        $target = $this->config['login.target'];
+        if ($this->config['login.use_referrer']) {
+            $target = $this->context->get('login.target', $target);
+            $this->context->remove('login.target');
+        }
+
+        return new RedirectResponse($target);
     }
 }

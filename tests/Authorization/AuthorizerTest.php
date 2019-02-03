@@ -13,7 +13,7 @@ class AuthorizerTest extends TestCase
     /**
      * @var Authorizer
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {
@@ -39,7 +39,7 @@ class AuthorizerTest extends TestCase
     /**
      * @return UserInterface|MockObject
      */
-    protected function createUser(): UserInterface
+    private function createUser(): UserInterface
     {
         return $this->createMock(UserInterface::class);
     }

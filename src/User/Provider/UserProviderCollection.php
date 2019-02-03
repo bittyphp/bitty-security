@@ -10,7 +10,7 @@ class UserProviderCollection implements UserProviderInterface
     /**
      * @var UserProviderInterface[]
      */
-    protected $providers = [];
+    private $providers = [];
 
     /**
      * @param UserProviderInterface[] $providers

@@ -38,13 +38,23 @@ class HttpBasicShield extends AbstractShield
     }
 
     /**
+     * {@inheritDoc}
+     */
+    protected function getDefaultConfig(): array
+    {
+        return [
+            'realm' => 'Secured Area',
+        ];
+    }
+
+    /**
      * Gets the authenticated user, if any.
      *
      * @param ServerRequestInterface $request
      *
      * @return UserInterface|null
      */
-    protected function getUser(ServerRequestInterface $request): ?UserInterface
+    private function getUser(ServerRequestInterface $request): ?UserInterface
     {
         $user = $this->context->get('user');
         if ($user) {
@@ -65,15 +75,5 @@ class HttpBasicShield extends AbstractShield
         $user = $this->authenticate($username, $password);
 
         return $user;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getDefaultConfig(): array
-    {
-        return [
-            'realm' => 'Secured Area',
-        ];
     }
 }
