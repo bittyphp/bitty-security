@@ -13,7 +13,7 @@ class UserProviderCollectionTest extends TestCase
     /**
      * @var UserProviderCollection
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {
@@ -98,7 +98,7 @@ class UserProviderCollectionTest extends TestCase
     /**
      * @return UserProviderInterface|MockObject
      */
-    protected function createUserProvider(): UserProviderInterface
+    private function createUserProvider(): UserProviderInterface
     {
         return $this->createMock(UserProviderInterface::class);
     }

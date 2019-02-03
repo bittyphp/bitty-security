@@ -76,32 +76,9 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @return mixed[]
      */
-    protected function getDefaultConfig(): array
+    public function getDefaultConfig(): array
     {
         return [];
-    }
-
-    /**
-     * Triggers security events to enable external actions, e.g. logging.
-     *
-     * @param string|EventInterface $event
-     * @param null|object|string $target
-     * @param mixed[] $params
-     *
-     * @return mixed
-     */
-    protected function triggerEvent($event, $target = null, array $params = [])
-    {
-        if (!$this->container || !$this->container->has('event.manager')) {
-            return;
-        }
-
-        $eventManager = $this->container->get('event.manager');
-        if (!$eventManager instanceof EventManagerInterface) {
-            return;
-        }
-
-        return $eventManager->trigger($event, $target, $params);
     }
 
     /**
@@ -164,5 +141,28 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
         }
 
         $this->triggerEvent('security.authorization.success', $user);
+    }
+
+    /**
+     * Triggers security events to enable external actions, e.g. logging.
+     *
+     * @param string|EventInterface $event
+     * @param null|object|string $target
+     * @param mixed[] $params
+     *
+     * @return mixed
+     */
+    protected function triggerEvent($event, $target = null, array $params = [])
+    {
+        if (!$this->container || !$this->container->has('event.manager')) {
+            return;
+        }
+
+        $eventManager = $this->container->get('event.manager');
+        if (!$eventManager instanceof EventManagerInterface) {
+            return;
+        }
+
+        return $eventManager->trigger($event, $target, $params);
     }
 }

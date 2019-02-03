@@ -15,7 +15,7 @@ class ContextMapTest extends TestCase
     /**
      * @var ContextMap
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {
@@ -165,7 +165,7 @@ class ContextMapTest extends TestCase
      *
      * @return ContextInterface|MockObject
      */
-    protected function createContext(
+    private function createContext(
         bool $isDefault = false,
         bool $isShielded = false
     ): ContextInterface {
@@ -181,7 +181,7 @@ class ContextMapTest extends TestCase
     /**
      * @return ServerRequestInterface
      */
-    protected function createRequest(): ServerRequestInterface
+    private function createRequest(): ServerRequestInterface
     {
         return $this->createMock(ServerRequestInterface::class);
     }
@@ -189,7 +189,7 @@ class ContextMapTest extends TestCase
     /**
      * @return UserInterface
      */
-    protected function createUser(): UserInterface
+    private function createUser(): UserInterface
     {
         return $this->createMock(UserInterface::class);
     }

@@ -9,22 +9,22 @@ class User implements UserInterface
     /**
      * @var string
      */
-    protected $username = null;
+    private $username = null;
 
     /**
      * @var string
      */
-    protected $password = null;
+    private $password = null;
 
     /**
      * @var string|null
      */
-    protected $salt = null;
+    private $salt = null;
 
     /**
      * @var string[]
      */
-    protected $roles = null;
+    private $roles = null;
 
     /**
      * @param string $username

@@ -13,7 +13,7 @@ class AbstractEncoderTest extends TestCase
     /**
      * @var AbstractEncoder|MockObject
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {

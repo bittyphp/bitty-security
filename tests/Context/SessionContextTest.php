@@ -15,17 +15,17 @@ class SessionContextTest extends TestCase
     /**
      * @var SessionContext
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     /**
      * @var string
      */
-    protected $name = null;
+    private $name = null;
 
     /**
      * @var SessionInterface|MockObject
      */
-    protected $session = null;
+    private $session = null;
 
     protected function setUp(): void
     {
@@ -40,6 +40,19 @@ class SessionContextTest extends TestCase
     public function testInstanceOf(): void
     {
         self::assertInstanceOf(ContextInterface::class, $this->fixture);
+    }
+
+    public function testGetDefaultConfig(): void
+    {
+        $actual = $this->fixture->getDefaultConfig();
+
+        $expected = [
+            'default' => true,
+            'ttl' => 86400,
+            'timeout' => 0,
+            'destroy.delay' => 30,
+        ];
+        self::assertEquals($expected, $actual);
     }
 
     /**
@@ -533,7 +546,7 @@ class SessionContextTest extends TestCase
      *
      * @return ServerRequestInterface
      */
-    protected function createRequest(string $path): ServerRequestInterface
+    private function createRequest(string $path): ServerRequestInterface
     {
         $uri = $this->createConfiguredMock(
             UriInterface::class,

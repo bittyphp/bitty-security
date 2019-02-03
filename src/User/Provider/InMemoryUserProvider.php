@@ -11,7 +11,7 @@ class InMemoryUserProvider extends AbstractUserProvider
     /**
      * @var array Array of string[]
      */
-    protected $users = [];
+    private $users = [];
 
     /**
      * Users array should be structured like:

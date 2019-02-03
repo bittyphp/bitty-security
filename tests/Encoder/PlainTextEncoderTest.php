@@ -12,7 +12,7 @@ class PlainTextEncoderTest extends TestCase
     /**
      * @var PlainTextEncoder
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {

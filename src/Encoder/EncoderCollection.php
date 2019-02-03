@@ -12,7 +12,7 @@ class EncoderCollection implements EncoderCollectionInterface
     /**
      * @var EncoderInterface[]
      */
-    protected $encoders = [];
+    private $encoders = [];
 
     /**
      * @param EncoderInterface[]|EncoderInterface $encoders

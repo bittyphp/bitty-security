@@ -16,17 +16,17 @@ class AuthenticatorTest extends TestCase
     /**
      * @var Authenticator
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     /**
      * @var UserProviderInterface|MockObject
      */
-    protected $userProvider = null;
+    private $userProvider = null;
 
     /**
      * @var EncoderInterface|MockObject
      */
-    protected $encoder = null;
+    private $encoder = null;
 
     protected function setUp(): void
     {
@@ -175,7 +175,7 @@ class AuthenticatorTest extends TestCase
      *
      * @return UserInterface|MockObject
      */
-    protected function createUser(
+    private function createUser(
         string $username = '',
         string $hash = '',
         string $salt = ''

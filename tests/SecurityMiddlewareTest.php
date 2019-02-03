@@ -22,12 +22,12 @@ class SecurityMiddlewareTest extends TestCase
     /**
      * @var SecurityMiddleware
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     /**
      * @var ShieldInterface|MockObject
      */
-    protected $shield = null;
+    private $shield = null;
 
     protected function setUp(): void
     {
@@ -215,7 +215,7 @@ class SecurityMiddlewareTest extends TestCase
      *
      * @return ContainerInterface|MockObject
      */
-    protected function createContainer(ContextMapInterface $map = null): ContainerInterface
+    private function createContainer(ContextMapInterface $map = null): ContainerInterface
     {
         if (!$map) {
             $map = $this->createMock(ContextMapInterface::class);

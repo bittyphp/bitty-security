@@ -14,7 +14,7 @@ class EncoderCollectionTest extends TestCase
     /**
      * @var EncoderCollection
      */
-    protected $fixture = null;
+    private $fixture = null;
 
     protected function setUp(): void
     {
@@ -114,7 +114,7 @@ class EncoderCollectionTest extends TestCase
     /**
      * @return EncoderInterface
      */
-    protected function createEncoder(): EncoderInterface
+    private function createEncoder(): EncoderInterface
     {
         return $this->createMock(EncoderInterface::class);
     }
@@ -122,7 +122,7 @@ class EncoderCollectionTest extends TestCase
     /**
      * @return UserInterface
      */
-    protected function createUser(): UserInterface
+    private function createUser(): UserInterface
     {
         return $this->createMock(UserInterface::class);
     }
