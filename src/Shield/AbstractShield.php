@@ -23,22 +23,22 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
     /**
      * @var ContextInterface
      */
-    private $context = null;
+    protected $context = null;
 
     /**
      * @var AuthenticatorInterface
      */
-    private $authenticator = null;
+    protected $authenticator = null;
 
     /**
      * @var AuthorizerInterface
      */
-    private $authorizer = null;
+    protected $authorizer = null;
 
     /**
      * @var mixed[]
      */
-    private $config = null;
+    protected $config = null;
 
     /**
      * @param ContextInterface $context
@@ -152,7 +152,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      *
      * @return mixed
      */
-    private function triggerEvent($event, $target = null, array $params = [])
+    protected function triggerEvent($event, $target = null, array $params = [])
     {
         if (!$this->container || !$this->container->has('event.manager')) {
             return;
