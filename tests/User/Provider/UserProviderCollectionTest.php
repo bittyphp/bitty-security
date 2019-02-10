@@ -2,8 +2,8 @@
 
 namespace Bitty\Tests\Security\User\Provider;
 
-use Bitty\Security\User\Provider\UserProviderInterface;
 use Bitty\Security\User\Provider\UserProviderCollection;
+use Bitty\Security\User\Provider\UserProviderInterface;
 use Bitty\Security\User\UserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

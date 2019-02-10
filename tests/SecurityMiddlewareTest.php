@@ -215,7 +215,7 @@ class SecurityMiddlewareTest extends TestCase
      *
      * @return ContainerInterface|MockObject
      */
-    private function createContainer(ContextMapInterface $map = null): ContainerInterface
+    private function createContainer(?ContextMapInterface $map = null): ContainerInterface
     {
         if (!$map) {
             $map = $this->createMock(ContextMapInterface::class);

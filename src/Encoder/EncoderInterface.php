@@ -21,7 +21,7 @@ interface EncoderInterface
      *
      * @throws AuthenticationException If password is too long.
      */
-    public function encode(string $password, string $salt = null): string;
+    public function encode(string $password, ?string $salt = null): string;
 
     /**
      * Verifies the given password against the encoded password.
@@ -34,5 +34,5 @@ interface EncoderInterface
      *
      * @throws AuthenticationException If password is too long.
      */
-    public function verify(string $encoded, string $password, string $salt = null): bool;
+    public function verify(string $encoded, string $password, ?string $salt = null): bool;
 }

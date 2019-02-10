@@ -42,12 +42,14 @@ class ShieldCollection implements ShieldInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null): void
+    public function setContainer(?ContainerInterface $container = null): void
     {
         foreach ($this->shields as $shield) {
-            if ($shield instanceof ContainerAwareInterface) {
-                $shield->setContainer($container);
+            if (!($shield instanceof ContainerAwareInterface)) {
+                continue;
             }
+
+            $shield->setContainer($container);
         }
 
         $this->container = $container;

@@ -63,7 +63,7 @@ class SessionContext implements ContextInterface
             $this->session->start();
         }
 
-        if ('user' === $name) {
+        if ($name === 'user') {
             $now = time();
             $this->doSet('destroy', $now + $this->config['destroy.delay']);
             $this->session->regenerate();
@@ -85,7 +85,7 @@ class SessionContext implements ContextInterface
             $this->session->start();
         }
 
-        if ('user' === $name) {
+        if ($name === 'user') {
             $now     = time();
             $expires = $this->doGet('expires', 0);
             $destroy = $this->doGet('destroy', INF);
@@ -214,9 +214,11 @@ class SessionContext implements ContextInterface
     private function doClear(): void
     {
         foreach ($this->session->all() as $key => $value) {
-            if (substr($key, 0, strlen($this->name.'/')) === $this->name.'/') {
-                $this->session->remove($key);
+            if (substr($key, 0, strlen($this->name.'/')) !== $this->name.'/') {
+                continue;
             }
+
+            $this->session->remove($key);
         }
     }
 }
