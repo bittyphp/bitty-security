@@ -28,7 +28,7 @@ class MessageDigestEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function encode(string $password, string $salt = null): string
+    public function encode(string $password, ?string $salt = null): string
     {
         $this->checkPassword($password);
 

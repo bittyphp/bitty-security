@@ -147,7 +147,7 @@ abstract class AbstractShield implements ShieldInterface, ContainerAwareInterfac
      * Triggers security events to enable external actions, e.g. logging.
      *
      * @param string|EventInterface $event
-     * @param null|object|string $target
+     * @param object|string|null $target
      * @param mixed[] $params
      *
      * @return mixed

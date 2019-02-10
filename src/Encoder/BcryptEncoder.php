@@ -23,7 +23,7 @@ class BcryptEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function encode(string $password, string $salt = null): string
+    public function encode(string $password, ?string $salt = null): string
     {
         $this->checkPassword($password);
 
@@ -38,7 +38,7 @@ class BcryptEncoder extends AbstractEncoder
     /**
      * {@inheritDoc}
      */
-    public function verify(string $encoded, string $password, string $salt = null): bool
+    public function verify(string $encoded, string $password, ?string $salt = null): bool
     {
         $this->checkPassword($password);
 

@@ -84,7 +84,7 @@ class ContextCollection implements ContextInterface
         /** @var ContextInterface $context */
         foreach ($this->contexts as $context) {
             $value = $context->get($name);
-            if (null !== $value) {
+            if ($value !== null) {
                 return $value;
             }
         }

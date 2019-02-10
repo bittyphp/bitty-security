@@ -35,7 +35,7 @@ class User implements UserInterface
     public function __construct(
         string $username,
         string $password,
-        string $salt = null,
+        ?string $salt = null,
         array $roles = []
     ) {
         $this->username = $username;

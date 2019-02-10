@@ -91,7 +91,7 @@ class FormShield extends AbstractShield
      */
     private function handleFormLogin(ServerRequestInterface $request): ?ResponseInterface
     {
-        if ('POST' !== $request->getMethod()) {
+        if ($request->getMethod() !== 'POST') {
             return null;
         }
 

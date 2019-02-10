@@ -10,12 +10,12 @@ abstract class AbstractEncoder implements EncoderInterface
     /**
      * {@inheritDoc}
      */
-    abstract public function encode(string $password, string $salt = null): string;
+    abstract public function encode(string $password, ?string $salt = null): string;
 
     /**
      * {@inheritDoc}
      */
-    public function verify(string $encoded, string $password, string $salt = null): bool
+    public function verify(string $encoded, string $password, ?string $salt = null): bool
     {
         $this->checkPassword($password);
 

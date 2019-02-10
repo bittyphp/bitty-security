@@ -29,7 +29,7 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
      * @param ShieldInterface $shield
      * @param ContextMapInterface|null $contextMap
      */
-    public function __construct(ShieldInterface $shield, ContextMapInterface $contextMap = null)
+    public function __construct(ShieldInterface $shield, ?ContextMapInterface $contextMap = null)
     {
         if ($contextMap) {
             $contextMap->add($shield->getContext());
@@ -41,7 +41,7 @@ class SecurityMiddleware implements MiddlewareInterface, ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function setContainer(PsrContainerInterface $container = null): void
+    public function setContainer(?PsrContainerInterface $container = null): void
     {
         if ($container instanceof ContainerInterface) {
             $container->register(new ContextMapServiceProvider());

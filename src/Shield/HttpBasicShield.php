@@ -72,8 +72,6 @@ class HttpBasicShield extends AbstractShield
             return null;
         }
 
-        $user = $this->authenticate($username, $password);
-
-        return $user;
+        return $this->authenticate($username, $password);
     }
 }
