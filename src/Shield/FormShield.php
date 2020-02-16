@@ -40,7 +40,9 @@ class FormShield extends AbstractShield
         }
 
         if (!$user) {
-            $this->context->set('login.target', $path);
+            if ($this->config['login.use_referrer']) {
+                $this->context->set('login.target', $path);
+            }
 
             return new RedirectResponse($this->config['login.path']);
         }
